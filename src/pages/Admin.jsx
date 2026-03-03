@@ -24,6 +24,7 @@ function Admin() {
   const [newTeamCode, setNewTeamCode] = useState("");
   const [saving, setSaving] = useState(false);
   const [addingMemberTeamId, setAddingMemberTeamId] = useState(null);
+  const [rosterByTeam, setRosterByTeam] = useState({});
   const [activeTab, setActiveTab] = useState("teams");
 
   // Semester config
@@ -86,9 +87,63 @@ function Admin() {
     }));
   };
 
+  const loadRoster = async (teamId) => {
+    // Find team_index from team code (e.g. "T3" → 3)
+    const team = teams.find((t) => t.id === teamId);
+    if (!team?.code) {
+      setRosterByTeam((prev) => ({ ...prev, [teamId]: [] }));
+      return;
+    }
+    const match = team.code.match(/T(\d+)/i);
+    if (!match) {
+      setRosterByTeam((prev) => ({ ...prev, [teamId]: [] }));
+      return;
+    }
+    const teamIndex = parseInt(match[1]);
+    const { data } = await supabase
+      .from("student_roster")
+      .select("id, netid, first_name, last_name, team_index, matched_profile_id")
+      .eq("team_index", teamIndex)
+      .order("last_name");
+    setRosterByTeam((prev) => ({ ...prev, [teamId]: data || [] }));
+  };
+
+  const handleMoveRosterStudent = async (studentId, currentTeamId, newTeamIndex) => {
+    if (!newTeamIndex) return;
+    const idx = parseInt(newTeamIndex);
+    if (isNaN(idx)) return;
+    const { error } = await supabase
+      .from("student_roster")
+      .update({ team_index: idx })
+      .eq("id", studentId);
+    if (error) {
+      setMessage("Failed to move student: " + error.message);
+    } else {
+      setMessage("Student moved to T" + idx + ".");
+      loadRoster(currentTeamId);
+    }
+  };
+
+  const handleRemoveRosterStudent = async (studentId, teamId) => {
+    if (!window.confirm("Remove this student from the roster entirely?")) return;
+    const { error } = await supabase
+      .from("student_roster")
+      .delete()
+      .eq("id", studentId);
+    if (error) {
+      setMessage("Failed to remove: " + error.message);
+    } else {
+      setMessage("Student removed from roster.");
+      loadRoster(teamId);
+    }
+  };
+
   useEffect(() => {
-    if (expandedTeamId) loadMembers(expandedTeamId);
-  }, [expandedTeamId]);
+    if (expandedTeamId) {
+      loadMembers(expandedTeamId);
+      loadRoster(expandedTeamId);
+    }
+  }, [expandedTeamId, teams]);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
@@ -381,8 +436,41 @@ function Admin() {
                   </div>
                   {expandedTeamId === team.id && (
                     <div className="admin-members-panel">
+                      {/* Roster students (from CSV import) */}
                       <div className="admin-members-panel__header">
-                        <strong className="admin-members-panel__title">Members ({members.length})</strong>
+                        <strong className="admin-members-panel__title">Roster Students ({(rosterByTeam[team.id] || []).length})</strong>
+                      </div>
+                      <ul className="admin-member-list">
+                        {(rosterByTeam[team.id] || []).map((s) => (
+                          <li key={s.id} className="admin-member-item">
+                            <span>
+                              {s.first_name} {s.last_name} — {s.netid}
+                              {s.matched_profile_id && <span className="admin-roster-badge admin-roster-badge--linked"> (linked)</span>}
+                              {!s.matched_profile_id && <span className="admin-roster-badge admin-roster-badge--unlinked"> (not signed up)</span>}
+                            </span>
+                            <span className="admin-member-item__actions">
+                              <select
+                                className="field-input admin-roster-move"
+                                value=""
+                                onChange={(e) => handleMoveRosterStudent(s.id, team.id, e.target.value)}
+                              >
+                                <option value="">Move to...</option>
+                                {teams.filter((t) => t.id !== team.id).map((t) => (
+                                  <option key={t.id} value={t.code?.match(/T(\d+)/i)?.[1] || ""}>
+                                    {t.name || t.code}
+                                  </option>
+                                ))}
+                              </select>
+                              <button type="button" onClick={() => handleRemoveRosterStudent(s.id, team.id)} className="btn btn--danger btn--sm">Remove</button>
+                            </span>
+                          </li>
+                        ))}
+                        {(rosterByTeam[team.id] || []).length === 0 && <li className="admin-empty-state">No roster students for this team.</li>}
+                      </ul>
+
+                      {/* Signed-up members (from team_memberships) */}
+                      <div className="admin-members-panel__header" style={{ marginTop: "var(--spacing)" }}>
+                        <strong className="admin-members-panel__title">Signed-Up Members ({members.length})</strong>
                         {addingMemberTeamId !== team.id ? (
                           <button type="button" className="btn btn--secondary btn--sm" onClick={() => setAddingMemberTeamId(team.id)}>+ Add</button>
                         ) : (
@@ -411,11 +499,11 @@ function Admin() {
                           <li key={m.user_id} className="admin-member-item">
                             <span>{m.full_name || "(No name)"} — {m.email} {m.profile_role === "admin" ? " (admin)" : ""}</span>
                             {m.user_id !== user?.id && m.profile_role !== "admin" && (
-                              <button type="button" onClick={() => handleRemoveMember(team.id, m.user_id)} className="btn btn--danger">Remove</button>
+                              <button type="button" onClick={() => handleRemoveMember(team.id, m.user_id)} className="btn btn--danger btn--sm">Remove</button>
                             )}
                           </li>
                         ))}
-                        {members.length === 0 && <li className="admin-empty-state">No members yet.</li>}
+                        {members.length === 0 && <li className="admin-empty-state">No signed-up members yet.</li>}
                       </ul>
                     </div>
                   )}

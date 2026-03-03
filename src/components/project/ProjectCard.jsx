@@ -140,6 +140,17 @@ export default function ProjectCard({
                       value={link.url}
                       onChange={(e) => handleLinkChange(idx, 'url', e.target.value)}
                     />
+                    {link.url && (
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn--secondary btn--sm links-editor__open"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Open
+                      </a>
+                    )}
                     <button
                       type="button"
                       className="links-editor__remove"

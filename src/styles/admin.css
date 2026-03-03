@@ -225,6 +225,32 @@
   padding: var(--spacing-sm);
 }
 
+.admin-member-item__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.admin-roster-move {
+  width: 130px;
+  padding: 0.25rem 0.4rem;
+  font-size: var(--font-xs);
+}
+
+.admin-roster-badge {
+  font-size: var(--font-xs);
+  font-weight: 500;
+}
+
+.admin-roster-badge--linked {
+  color: var(--success, #16a34a);
+}
+
+.admin-roster-badge--unlinked {
+  color: var(--text-muted);
+}
+
 /* Section tabs for admin */
 .admin-tabs {
   display: flex;

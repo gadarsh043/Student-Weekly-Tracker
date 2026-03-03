@@ -72,13 +72,14 @@ export function useWeeks(teamId, userId, myTeam) {
 
       setWeeks(mapped);
 
-      // Default to first week if nothing is selected yet
-      if (mapped.length > 0 && !selectedWeekState) {
-        const first = mapped[0];
-        setSelectedWeekState(first);
-        setEditingGoal(first.goal || "");
-        setEditingRequest(first.request || "");
-      }
+      // Re-select the same week after reload, or default to first week
+      setSelectedWeekState((prev) => {
+        if (prev) {
+          const refreshed = mapped.find((w) => w.id === prev.id);
+          if (refreshed) return refreshed;
+        }
+        return mapped[0] || null;
+      });
     },
     [teamId]
   );
@@ -155,34 +156,21 @@ export function useWeeks(teamId, userId, myTeam) {
           work_done: editingReport.work_done || null,
         };
 
-        if (editingReport.id) {
-          // Update existing report row
-          const rError = await supabase
-            .from("weekly_reports")
-            .update(payload)
-            .eq("id", editingReport.id)
-            .then((r) => r.error);
+        const upsertPayload = {
+          team_id: myTeam.id,
+          week_id: selectedWeekState.id,
+          submitted_by: userId,
+          ...payload,
+        };
+        if (editingReport.id) upsertPayload.id = editingReport.id;
 
-          if (rError) {
-            console.error("Failed to save report details:", rError);
-            return { error: rError };
-          }
-        } else {
-          // Insert new report row
-          const { error: insertErr } = await supabase
-            .from("weekly_reports")
-            .insert({
-              team_id: myTeam.id,
-              week_id: selectedWeekState.id,
-              submitted_by: userId,
-              file_path: null,
-              ...payload,
-            });
+        const { error: rError } = await supabase
+          .from("weekly_reports")
+          .upsert(upsertPayload, { onConflict: "team_id,week_id" });
 
-          if (insertErr) {
-            console.error("Failed to create report:", insertErr);
-            return { error: insertErr };
-          }
+        if (rError) {
+          console.error("Failed to save report:", rError);
+          return { error: rError };
         }
       }
 
@@ -240,28 +228,19 @@ export function useWeeks(teamId, userId, myTeam) {
 
           if (uploadError) throw uploadError;
 
-          if (existingReport?.id) {
-            const { error: updateError } = await supabase
-              .from("weekly_reports")
-              .update({
-                file_path: filePath,
-                submitted_by: userId,
-                status: "submitted",
-              })
-              .eq("id", existingReport.id);
-            if (updateError) throw updateError;
-          } else {
-            const { error: insertError } = await supabase
-              .from("weekly_reports")
-              .insert({
-                team_id: myTeam.id,
-                week_id: week.id,
-                submitted_by: userId,
-                file_path: filePath,
-                status: "submitted",
-              });
-            if (insertError) throw insertError;
-          }
+          const upsertPayload = {
+            team_id: myTeam.id,
+            week_id: week.id,
+            submitted_by: userId,
+            file_path: filePath,
+            status: "submitted",
+          };
+          if (existingReport?.id) upsertPayload.id = existingReport.id;
+
+          const { error: upsertError } = await supabase
+            .from("weekly_reports")
+            .upsert(upsertPayload, { onConflict: "team_id,week_id" });
+          if (upsertError) throw upsertError;
 
           await loadWeeks(myTeam.id);
           return { replaced: !!existingReport };
