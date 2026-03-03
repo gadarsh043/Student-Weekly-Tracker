@@ -5,17 +5,17 @@ export default function SubmissionActions({ week, onUpload, onView, onDelete, up
     <div className="submission-actions">
       {hasFile && (
         <button className="btn-view-pdf" onClick={onView}>
-          View PDF
+          View Document
         </button>
       )}
 
       <button className="btn-add-pdf" onClick={onUpload} disabled={uploading}>
-        {hasFile ? 'Replace PDF' : 'Add PDF'}
+        {hasFile ? 'Replace Document' : 'Add Document'}
       </button>
 
       {hasFile && (
         <button className="btn-delete-pdf" onClick={onDelete} disabled={uploading}>
-          Delete PDF
+          Delete Document
         </button>
       )}
 

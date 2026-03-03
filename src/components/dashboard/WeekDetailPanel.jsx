@@ -180,7 +180,7 @@ export default function WeekDetailPanel({
         <div className="week-panel__divider" />
 
         <div className="field-group">
-          <span className="field-label">PDF Submission</span>
+          <span className="field-label">Document Submission</span>
           <SubmissionActions
             week={selectedWeek}
             onUpload={onUpload}

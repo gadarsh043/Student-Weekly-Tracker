@@ -202,10 +202,10 @@ export function useWeeks(teamId, userId, myTeam) {
     loadWeeks,
   ]);
 
-  // ---------- PDF upload ----------
+  // ---------- Document upload ----------
 
   /**
-   * Opens a file picker, uploads a PDF to Supabase Storage `weekly-reports`
+   * Opens a file picker, uploads a document to Supabase Storage `weekly-reports`
    * bucket, and updates or inserts the weekly_reports row.
    */
   const handleUploadClick = useCallback(
@@ -214,7 +214,7 @@ export function useWeeks(teamId, userId, myTeam) {
 
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = "application/pdf";
+      input.accept = ".pdf,.ppt,.pptx,.txt,.doc,.docx";
       input.onchange = async () => {
         const file = input.files?.[0];
         if (!file) return;
@@ -222,7 +222,8 @@ export function useWeeks(teamId, userId, myTeam) {
         setUploading(true);
 
         try {
-          const filePath = `team-${myTeam.id}/week-${week.week_number}/${userId}-${Date.now()}.pdf`;
+          const ext = file.name.split('.').pop() || 'pdf';
+          const filePath = `team-${myTeam.id}/week-${week.week_number}/${userId}-${Date.now()}.${ext}`;
           const existingReport = week.report;
           const oldFilePath = existingReport?.file_path || null;
 
@@ -234,7 +235,7 @@ export function useWeeks(teamId, userId, myTeam) {
           const { error: uploadError } = await supabase.storage
             .from("weekly-reports")
             .upload(filePath, file, {
-              contentType: "application/pdf",
+              contentType: file.type || "application/octet-stream",
             });
 
           if (uploadError) throw uploadError;
@@ -277,17 +278,17 @@ export function useWeeks(teamId, userId, myTeam) {
     [userId, myTeam, loadWeeks]
   );
 
-  // ---------- PDF delete ----------
+  // ---------- Document delete ----------
 
   /**
-   * Remove a PDF from Storage and clear the file_path on the report row.
+   * Remove a document from Storage and clear the file_path on the report row.
    */
   const handleDeletePdfClick = useCallback(
     async (week) => {
       if (!week?.report?.file_path) return;
 
       const confirmed = window.confirm(
-        "Delete this week's PDF from the server? You can upload a new one later."
+        "Delete this week's document from the server? You can upload a new one later."
       );
       if (!confirmed) return;
 
@@ -332,7 +333,7 @@ export function useWeeks(teamId, userId, myTeam) {
 
     if (error || !data || !data.file_path) {
       if (!data?.file_path) {
-        console.warn("No PDF uploaded for this week yet.");
+        console.warn("No document uploaded for this week yet.");
       } else {
         console.error(error || "No data");
       }
@@ -482,7 +483,7 @@ export function useWeeks(teamId, userId, myTeam) {
 
         folder.file("week-data.pdf", doc.output("blob"));
 
-        // Submission PDF for this week (if any)
+        // Submission document for this week (if any)
         if (r?.file_path) {
           const { data: urlData, error: urlErr } = await supabase.storage
             .from("weekly-reports")
@@ -491,7 +492,8 @@ export function useWeeks(teamId, userId, myTeam) {
             const res = await fetch(urlData.signedUrl);
             if (res.ok) {
               const blob = await res.blob();
-              folder.file("submission.pdf", blob);
+              const submissionExt = r.file_path.split('.').pop() || 'pdf';
+              folder.file(`submission.${submissionExt}`, blob);
             }
           }
         }
