@@ -251,6 +251,18 @@
   color: var(--text-muted);
 }
 
+.admin-roster-add-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.admin-roster-add-form .field-input {
+  flex: 1;
+  min-width: 120px;
+}
+
 /* Section tabs for admin */
 .admin-tabs {
   display: flex;

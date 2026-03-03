@@ -25,6 +25,10 @@ function Admin() {
   const [saving, setSaving] = useState(false);
   const [addingMemberTeamId, setAddingMemberTeamId] = useState(null);
   const [rosterByTeam, setRosterByTeam] = useState({});
+  const [addingRosterTeamId, setAddingRosterTeamId] = useState(null);
+  const [newRosterFirst, setNewRosterFirst] = useState("");
+  const [newRosterLast, setNewRosterLast] = useState("");
+  const [newRosterNetid, setNewRosterNetid] = useState("");
   const [activeTab, setActiveTab] = useState("teams");
 
   // Semester config
@@ -134,6 +138,38 @@ function Admin() {
       setMessage("Failed to remove: " + error.message);
     } else {
       setMessage("Student removed from roster.");
+      loadRoster(teamId);
+    }
+  };
+
+  const handleAddRosterStudent = async (teamId) => {
+    if (!newRosterFirst.trim() || !newRosterLast.trim() || !newRosterNetid.trim()) {
+      setMessage("First name, last name, and NetID are required.");
+      return;
+    }
+    const team = teams.find((t) => t.id === teamId);
+    const match = team?.code?.match(/T(\d+)/i);
+    if (!match) {
+      setMessage("Team has no valid code (e.g. T1). Cannot determine team_index.");
+      return;
+    }
+    const teamIndex = parseInt(match[1]);
+    const { error } = await supabase
+      .from("student_roster")
+      .insert({
+        first_name: newRosterFirst.trim(),
+        last_name: newRosterLast.trim(),
+        netid: newRosterNetid.trim().toLowerCase(),
+        team_index: teamIndex,
+      });
+    if (error) {
+      setMessage("Failed to add student: " + (error.message.includes("duplicate") ? "NetID already exists in roster." : error.message));
+    } else {
+      setMessage(`${newRosterFirst.trim()} ${newRosterLast.trim()} added to roster.`);
+      setNewRosterFirst("");
+      setNewRosterLast("");
+      setNewRosterNetid("");
+      setAddingRosterTeamId(null);
       loadRoster(teamId);
     }
   };
@@ -439,7 +475,48 @@ function Admin() {
                       {/* Roster students (from CSV import) */}
                       <div className="admin-members-panel__header">
                         <strong className="admin-members-panel__title">Roster Students ({(rosterByTeam[team.id] || []).length})</strong>
+                        {addingRosterTeamId !== team.id ? (
+                          <button type="button" className="btn btn--secondary btn--sm" onClick={() => setAddingRosterTeamId(team.id)}>+ Add Student</button>
+                        ) : (
+                          <button type="button" className="btn btn--ghost btn--sm" onClick={() => setAddingRosterTeamId(null)}>Cancel</button>
+                        )}
                       </div>
+                      {addingRosterTeamId === team.id && (
+                        <div className="admin-add-member-box">
+                          <p className="admin-add-member-box__title">Add a student to the roster:</p>
+                          <div className="admin-roster-add-form">
+                            <input
+                              type="text"
+                              className="field-input"
+                              placeholder="First Name"
+                              value={newRosterFirst}
+                              onChange={(e) => setNewRosterFirst(e.target.value)}
+                            />
+                            <input
+                              type="text"
+                              className="field-input"
+                              placeholder="Last Name"
+                              value={newRosterLast}
+                              onChange={(e) => setNewRosterLast(e.target.value)}
+                            />
+                            <input
+                              type="text"
+                              className="field-input"
+                              placeholder="NetID"
+                              value={newRosterNetid}
+                              onChange={(e) => setNewRosterNetid(e.target.value)}
+                            />
+                            <button
+                              type="button"
+                              className="btn btn--primary btn--sm"
+                              onClick={() => handleAddRosterStudent(team.id)}
+                              disabled={!newRosterFirst.trim() || !newRosterLast.trim() || !newRosterNetid.trim()}
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      )}
                       <ul className="admin-member-list">
                         {(rosterByTeam[team.id] || []).map((s) => (
                           <li key={s.id} className="admin-member-item">
