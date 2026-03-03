@@ -1,15 +1,15 @@
 # CS 4485 — Weekly Progress Tracker
 
-A TA management tool for tracking weekly progress of senior design project teams at UT Dallas. Built for Prof. Alagar's CS 4485 course — manages 13 teams (~73 students) across an 11-week semester cycle.
+A TA management tool for tracking weekly progress of senior design project teams at UT Dallas. Built for Prof. Alagar's CS 4485 course — manages 13 teams (~73 students) across a configurable semester cycle.
 
 ## Features
 
 ### Weekly Tracker (Student View)
-- **11-week horizontal timeline** with date ranges and holiday markers
-- **Weekly report fields** — goal, help request, work done, team leader, meeting minutes
-- **PDF submission** — upload weekly report PDFs stored in Supabase Storage
+- **Horizontal week timeline** with date ranges and holiday markers
+- **Weekly report fields** — goal, help request, work done, team leader, meeting minutes, comments
+- **Document submission** — upload weekly reports as PDF, PPT, PPTX, DOC, DOCX, or TXT (stored in Supabase Storage)
 - **Per-week download** — download individual week reports as PDF
-- **Download all** — export all weeks as a ZIP archive
+- **Download all** — export all weeks as a ZIP archive (includes generated PDFs + uploaded documents)
 - **Read-only project details** — students see project info but cannot edit
 
 ### Weekly Tracker (Admin/TA Tools)
@@ -29,7 +29,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Grade formula** — (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / total weight, mapped to A through F
 
 ### Metrics Page (Admin)
-- **Weekly trends line chart** — avg hours + attendance rate over 11 weeks (recharts)
+- **Weekly trends line chart** — avg hours + attendance rate over weeks (recharts)
 - **Effort distribution pie chart** — hours per student visualization
 - **Attendance overview bar chart** — stacked Present/Absent/Excused per week
 - **Satisfaction timeline** — week-by-week team rating chips with inline editing
@@ -38,9 +38,9 @@ A TA management tool for tracking weekly progress of senior design project teams
 
 ### Admin Dashboard
 - **Team management** — create/edit/delete teams, manage team members
-- **CSV import** — bulk import student roster from CSV; existing students are preserved (never overwritten)
+- **CSV import** — bulk import student roster from CSV; existing students are preserved (never overwritten); auto-creates teams T1-T13 from roster data
 - **Member management** — view team members, roster students, linked profiles
-- **Semester configuration** — set semester start date, mark holiday weeks (e.g. Spring Break), auto-calculated week date ranges
+- **Semester configuration** — set semester start date, mark holiday weeks (e.g. Spring Break), configure total weeks, auto-calculated week date ranges
 
 ### Authentication
 - **Google OAuth** — sign in with Google accounts
@@ -58,7 +58,8 @@ A TA management tool for tracking weekly progress of senior design project teams
 | Frontend | React 18, Vite, React Router v6 |
 | Backend | Supabase (PostgreSQL, Auth, Storage) |
 | Charts | recharts |
-| PDF Generation | jsPDF, JSZip |
+| PDF Generation | jsPDF |
+| ZIP Archives | JSZip |
 | Styling | Vanilla CSS with BEM naming + CSS custom properties |
 
 ## Getting Started
@@ -106,18 +107,21 @@ You can find these values in your Supabase project dashboard under **Settings > 
 Run these SQL statements in the Supabase SQL editor:
 
 ```sql
+-- Enum types
+CREATE TYPE user_role AS ENUM ('student', 'admin');
+CREATE TYPE team_role AS ENUM ('member', 'leader');
+CREATE TYPE report_status AS ENUM ('pending', 'submitted', 'reviewed', 'late');
+
 -- Profiles (auto-created on auth signup via trigger)
 CREATE TABLE profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id),
   email text,
-  display_name text,
   full_name text,
   first_name text,
   last_name text,
   netid text,
   student_id text,
-  role text DEFAULT 'student',
-  avatar_url text,
+  role user_role DEFAULT 'student',
   created_at timestamptz DEFAULT now()
 );
 
@@ -131,7 +135,9 @@ CREATE TABLE teams (
   links jsonb DEFAULT '[]',
   meeting_link text,
   meeting_time text,
+  total_weeks integer NOT NULL DEFAULT 11,
   is_active boolean DEFAULT true,
+  created_by uuid REFERENCES profiles(id),
   created_at timestamptz DEFAULT now()
 );
 
@@ -140,19 +146,20 @@ CREATE TABLE team_memberships (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   team_id bigint NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
   user_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  role text DEFAULT 'member',
+  role team_role DEFAULT 'member',
   joined_at timestamptz DEFAULT now(),
   UNIQUE(team_id, user_id)
 );
 
--- Team weeks (11 per team)
+-- Team weeks (one per week per team)
 CREATE TABLE team_weeks (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   team_id bigint NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-  week_number integer NOT NULL CHECK (week_number BETWEEN 1 AND 11),
+  week_number integer NOT NULL,
+  start_date date,
+  end_date date,
   goal text,
   request text,
-  created_at timestamptz DEFAULT now(),
   UNIQUE(team_id, week_number)
 );
 
@@ -161,17 +168,15 @@ CREATE TABLE weekly_reports (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   team_id bigint NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
   week_id bigint REFERENCES team_weeks(id) ON DELETE CASCADE,
-  week_number integer,
-  status text DEFAULT 'pending' CHECK (status IN ('pending','submitted','reviewed','late')),
+  submitted_by uuid NOT NULL REFERENCES profiles(id),
   file_path text,
+  status report_status DEFAULT 'submitted',
   comments text,
   team_leader_week text,
   mom_meeting text,
   work_done text,
-  links jsonb,
-  submitted_by uuid REFERENCES auth.users(id),
-  submitted_at timestamptz,
-  created_at timestamptz DEFAULT now(),
+  links jsonb DEFAULT '[]',
+  submitted_at timestamptz DEFAULT now(),
   UNIQUE(team_id, week_id)
 );
 
@@ -179,12 +184,11 @@ CREATE TABLE weekly_reports (
 CREATE TABLE student_roster (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   netid text UNIQUE NOT NULL,
-  first_name text,
-  last_name text,
-  email text,
-  team_index integer,
-  section_number text,
-  matched_profile_id uuid REFERENCES auth.users(id),
+  first_name text NOT NULL,
+  last_name text NOT NULL,
+  team_index integer NOT NULL,
+  section_number integer,
+  matched_profile_id uuid REFERENCES profiles(id),
   created_at timestamptz DEFAULT now()
 );
 
@@ -194,9 +198,8 @@ CREATE TABLE attendance_records (
   student_netid text NOT NULL,
   team_index integer NOT NULL,
   week_number integer NOT NULL,
-  status text CHECK (status IN ('P','A','Excused','')),
-  recorded_by uuid REFERENCES auth.users(id),
-  created_at timestamptz DEFAULT now(),
+  status text NOT NULL DEFAULT '',
+  recorded_at timestamptz DEFAULT now(),
   UNIQUE(student_netid, week_number)
 );
 
@@ -208,7 +211,7 @@ CREATE TABLE student_effort_points (
   week_number integer NOT NULL,
   effort_points numeric NOT NULL DEFAULT 0,
   contribution_points numeric NOT NULL DEFAULT 0,
-  recorded_by uuid REFERENCES auth.users(id),
+  recorded_by uuid REFERENCES profiles(id),
   created_at timestamptz DEFAULT now(),
   UNIQUE(student_netid, team_id, week_number)
 );
@@ -218,8 +221,8 @@ CREATE TABLE team_ratings (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   team_id bigint NOT NULL REFERENCES teams(id),
   week_number integer NOT NULL,
-  rating text NOT NULL CHECK (rating IN ('Excellent','Good','Ok','Bad')),
-  rated_by uuid REFERENCES auth.users(id),
+  rating text NOT NULL CHECK (rating IN ('Excellent', 'Good', 'Ok', 'Bad')),
+  rated_by uuid REFERENCES profiles(id),
   created_at timestamptz DEFAULT now(),
   UNIQUE(team_id, week_number)
 );
@@ -235,10 +238,46 @@ CREATE TABLE semester_config (
 );
 ```
 
+#### Row-Level Security (RLS)
+
+Enable RLS on all tables, then add policies. Example for `weekly_reports`:
+
+```sql
+-- Enable RLS
+ALTER TABLE weekly_reports ENABLE ROW LEVEL SECURITY;
+
+-- Allow team members and admins to insert reports
+CREATE POLICY "Allow insert weekly_reports"
+ON weekly_reports FOR INSERT TO authenticated
+WITH CHECK (
+  submitted_by = auth.uid()
+  AND (
+    team_id IN (SELECT team_id FROM team_memberships WHERE user_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  )
+);
+
+-- Allow team members and admins to update reports
+CREATE POLICY "Allow update weekly_reports"
+ON weekly_reports FOR UPDATE TO authenticated
+USING (
+  team_id IN (SELECT team_id FROM team_memberships WHERE user_id = auth.uid())
+  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+);
+
+-- Allow authenticated users to read reports
+CREATE POLICY "Allow select weekly_reports"
+ON weekly_reports FOR SELECT TO authenticated
+USING (true);
+```
+
+Apply similar RLS policies to all other tables as needed.
+
 #### Storage
+
 1. Create a storage bucket named `weekly-reports`
 2. Set it to **private** (signed URLs are used for access)
-3. Add a storage policy allowing authenticated users to upload/read
+3. Add a storage policy allowing authenticated users to upload/read/delete
 
 ### 4. Run the app
 
@@ -296,19 +335,22 @@ npm run preview   # Preview production build
 
 ```
 src/
-  contexts/       AuthContext (Google + Microsoft OAuth, netid prompt, auto-match)
-  hooks/          useAuth, useTeams, useWeeks, useWeekPanel, useMetrics, useSemesterConfig
-  pages/          Home, Admin, Grades, Metrics
+  App.jsx           Main app wrapper (AuthProvider + Router)
+  main.jsx          Vite entry point (CSS imports + React root)
+  contexts/         AuthContext (Google + Microsoft OAuth, netid prompt, auto-match)
+  hooks/            useAuth, useTeams, useWeeks, useWeekPanel, useMetrics, useSemesterConfig
+  pages/            Home, Admin, Grades, Metrics
   components/
-    layout/       AppShell, TopNav, Sidebar, PageLayout
-    dashboard/    WeekTimeline, WeekDetailPanel, SubmissionActions
-    project/      ProjectCard, TeamMembersList
-    profile/      ProfileCard, ProfileEditModal
-    admin/        CsvImportPanel
-    common/       Modal, Toast, LoadingSpinner, EmptyState
-  routes/         AppRoutes (/, /admin, /grades, /metrics)
-  styles/         8 feature-scoped CSS files
-  utils/          supabaseClient, constants (with computeWeekDates), csvParser
+    layout/         AppShell, TopNav, Sidebar, PageLayout
+    dashboard/      WeekTimeline, WeekDetailPanel, SubmissionActions
+    project/        ProjectCard, TeamMembersList
+    profile/        ProfileCard, ProfileEditModal
+    admin/          CsvImportPanel
+    attendance/     AttendanceCell, AttendanceTable
+    common/         Modal, Toast, LoadingSpinner, EmptyState
+  routes/           AppRoutes (/, /admin, /grades, /metrics)
+  styles/           8 feature-scoped CSS files (BEM naming + CSS custom properties)
+  utils/            supabaseClient, constants (computeWeekDates), csvParser
 ```
 
 ## Migration Notes
