@@ -1,0 +1,310 @@
+/* Admin page styles */
+
+.admin-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.admin-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+}
+
+.admin-page__header h1 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-page__nav {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.admin-back-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: var(--font-sm);
+}
+
+.admin-back-link:hover {
+  text-decoration: underline;
+}
+
+/* Create team form */
+.admin-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+  align-items: flex-end;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-form-group .field-input {
+  min-width: 160px;
+}
+
+/* Teams list */
+.admin-teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.admin-team-row {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--card-bg);
+  transition: box-shadow var(--transition);
+}
+
+.admin-team-row:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+.admin-team-row--inactive {
+  background: var(--page-bg);
+  opacity: 0.75;
+}
+
+.admin-team-row__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem var(--spacing);
+  cursor: pointer;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.admin-team-row__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.admin-team-row__name {
+  font-weight: 600;
+  font-size: var(--font-base);
+}
+
+.admin-team-row__code {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.admin-team-row__badge {
+  font-size: var(--font-xs);
+  background: #fef3c7;
+  color: #92400e;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.admin-team-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.admin-team-row__edit-input {
+  width: 140px;
+}
+
+.admin-team-row__edit-input--narrow {
+  width: 80px;
+}
+
+.admin-team-row__edit-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-sm);
+}
+
+/* Members panel */
+.admin-members-panel {
+  padding: var(--spacing);
+  border-top: 1px solid var(--border-color);
+  background: var(--page-bg);
+}
+
+.admin-members-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.admin-members-panel__title {
+  font-size: var(--font-base);
+  font-weight: 600;
+}
+
+.admin-members-toggle {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+}
+
+/* Add member box */
+.admin-add-member-box {
+  margin-bottom: var(--spacing);
+  padding: var(--spacing);
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: var(--border);
+}
+
+.admin-add-member-box__title {
+  font-size: var(--font-sm);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.admin-add-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.admin-add-member-btn {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition);
+}
+
+.admin-add-member-btn:hover {
+  background: var(--page-bg);
+}
+
+/* Member list */
+.admin-member-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: var(--font-sm);
+}
+
+.admin-member-item:last-child {
+  border-bottom: none;
+}
+
+.admin-empty-state {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  padding: var(--spacing-sm);
+}
+
+/* Section tabs for admin */
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-tab {
+  padding: 0.6rem 1.2rem;
+  font-size: var(--font-base);
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+
+.admin-tab:hover {
+  color: var(--text-secondary);
+}
+
+.admin-tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Semester config grid */
+.semester-weeks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.semester-week-card {
+  padding: var(--spacing-sm) var(--spacing);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.semester-week-card:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.semester-week-card--holiday {
+  border-color: #eab308;
+  background: #fefce8;
+}
+
+.semester-week-card--holiday:hover {
+  border-color: #ca8a04;
+  background: #fef9c3;
+}
+
+.semester-week-card__number {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  color: var(--text);
+}
+
+.semester-week-card__date {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+.semester-week-card__badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ca8a04;
+  letter-spacing: 0.05em;
+}

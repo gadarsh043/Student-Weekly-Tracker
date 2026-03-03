@@ -1,0 +1,205 @@
+import { useState } from 'react';
+
+export default function ProjectCard({
+  team,
+  projectTitle,
+  projectOverview,
+  projectLinks,
+  meetingLink,
+  meetingTime,
+  isAdmin,
+  onTitleChange,
+  onOverviewChange,
+  onLinksChange,
+  onMeetingLinkChange,
+  onMeetingTimeChange,
+  onSave,
+  saving,
+  onDownloadAll,
+  downloadingAll,
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const links = projectLinks ?? [];
+
+  const handleAddLink = () => {
+    onLinksChange([...links, { label: '', url: '' }]);
+  };
+
+  const handleRemoveLink = (index) => {
+    onLinksChange(links.filter((_, i) => i !== index));
+  };
+
+  const handleLinkChange = (index, field, value) => {
+    const updated = links.map((link, i) =>
+      i === index ? { ...link, [field]: value } : link
+    );
+    onLinksChange(updated);
+  };
+
+  return (
+    <div className="project-card">
+      <div
+        className="project-card__header"
+        onClick={() => setIsExpanded((prev) => !prev)}
+      >
+        <h2 className="project-card__title">
+          {team?.name ?? 'Project'}
+          {projectTitle && (
+            <span className="project-card__subtitle"> &mdash; {projectTitle}</span>
+          )}
+        </h2>
+        <div className="project-card__header-right">
+          {onDownloadAll && (
+            <button
+              className="btn btn--secondary btn--sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDownloadAll();
+              }}
+              disabled={downloadingAll}
+            >
+              {downloadingAll ? 'Downloading...' : 'Download All'}
+            </button>
+          )}
+          <span className="project-card__chevron">
+            {isExpanded ? '\u25B2' : '\u25BC'}
+          </span>
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div className="project-card__body">
+          {/* Students see read-only view; admins can edit */}
+          {isAdmin ? (
+            <>
+              <div className="week-panel__row">
+                <div className="field-group">
+                  <span className="field-label">Project Title</span>
+                  <input
+                    className="field-input"
+                    type="text"
+                    value={projectTitle ?? ''}
+                    onChange={(e) => onTitleChange(e.target.value)}
+                    placeholder="Enter project title"
+                  />
+                </div>
+                <div className="field-group">
+                  <span className="field-label">Meeting Link</span>
+                  <input
+                    className="field-input"
+                    type="url"
+                    value={meetingLink ?? ''}
+                    onChange={(e) => onMeetingLinkChange(e.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+
+              <div className="field-group">
+                <span className="field-label">Project Overview</span>
+                <textarea
+                  className="field-textarea"
+                  value={projectOverview ?? ''}
+                  onChange={(e) => onOverviewChange(e.target.value)}
+                  rows={3}
+                  placeholder="Brief project description..."
+                />
+              </div>
+
+              <div className="week-panel__row">
+                <div className="field-group">
+                  <span className="field-label">Meeting Time</span>
+                  <input
+                    className="field-input"
+                    type="text"
+                    value={meetingTime ?? ''}
+                    onChange={(e) => onMeetingTimeChange(e.target.value)}
+                    placeholder="e.g. Wed 3:00 PM"
+                  />
+                </div>
+                <div />
+              </div>
+
+              {/* Links editor */}
+              <div className="field-group">
+                <span className="field-label">Project Links</span>
+                {links.map((link, idx) => (
+                  <div key={idx} className="links-editor__row">
+                    <input
+                      className="field-input links-editor__label-input"
+                      type="text"
+                      placeholder="Label"
+                      value={link.label}
+                      onChange={(e) => handleLinkChange(idx, 'label', e.target.value)}
+                    />
+                    <input
+                      className="field-input links-editor__url-input"
+                      type="url"
+                      placeholder="https://..."
+                      value={link.url}
+                      onChange={(e) => handleLinkChange(idx, 'url', e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="links-editor__remove"
+                      onClick={() => handleRemoveLink(idx)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className="links-editor__add" onClick={handleAddLink}>
+                  + Add Link
+                </button>
+              </div>
+
+              <div className="project-card__actions">
+                <button className="btn btn--primary" onClick={onSave} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save Project'}
+                </button>
+              </div>
+            </>
+          ) : (
+            /* Student read-only view */
+            <div className="project-card__readonly">
+              {projectOverview && (
+                <div className="field-group">
+                  <span className="field-label">Overview</span>
+                  <p className="readonly-field">{projectOverview}</p>
+                </div>
+              )}
+              <div className="week-panel__row">
+                <div className="field-group">
+                  <span className="field-label">Meeting Link</span>
+                  <div className="readonly-field">
+                    {meetingLink ? (
+                      <a href={meetingLink} target="_blank" rel="noreferrer">{meetingLink}</a>
+                    ) : '—'}
+                  </div>
+                </div>
+                <div className="field-group">
+                  <span className="field-label">Meeting Time</span>
+                  <div className="readonly-field">{meetingTime || '—'}</div>
+                </div>
+              </div>
+              {links.length > 0 && (
+                <div className="field-group">
+                  <span className="field-label">Project Links</span>
+                  {links.map((link, idx) => (
+                    <div key={idx} className="readonly-field">
+                      {link.label && <strong>{link.label}: </strong>}
+                      {link.url ? (
+                        <a href={link.url} target="_blank" rel="noreferrer">{link.url}</a>
+                      ) : '—'}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

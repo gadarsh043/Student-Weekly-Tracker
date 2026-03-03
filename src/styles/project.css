@@ -1,0 +1,131 @@
+/* Project card styles */
+
+.project-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: box-shadow var(--transition);
+}
+
+.project-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+.project-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing) var(--spacing-lg);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+  gap: var(--spacing);
+}
+
+.project-card__header:hover {
+  background: var(--page-bg);
+}
+
+.project-card__title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.project-card__subtitle {
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: var(--font-base);
+}
+
+.project-card__header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.project-card__chevron {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  width: 20px;
+  text-align: center;
+}
+
+.project-card__body {
+  padding: var(--spacing) var(--spacing-lg) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  border-top: var(--border);
+}
+
+/* Links editor */
+.links-editor__row {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  align-items: center;
+}
+
+.links-editor__label-input {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.links-editor__url-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.links-editor__remove {
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fecaca;
+  background: var(--danger-light);
+  color: var(--danger);
+  font-size: var(--font-xs);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+
+.links-editor__remove:hover {
+  background: #fecaca;
+}
+
+.links-editor__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+  background: var(--page-bg);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.links-editor__add:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* Project actions row */
+.project-card__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  padding-top: var(--spacing);
+  border-top: var(--border);
+}

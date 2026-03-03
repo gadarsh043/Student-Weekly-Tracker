@@ -1,0 +1,408 @@
+/* Metrics page */
+
+.metrics-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.metrics-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.metrics-page__header h1 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin: 0;
+}
+
+.metrics-page__sub {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+}
+
+.metrics-page__controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.metrics-page__team-select {
+  min-width: 220px;
+}
+
+/* Stats Overview Cards */
+.metrics-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing);
+}
+
+@media (max-width: 768px) {
+  .metrics-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metrics-stat-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+  padding: var(--spacing-lg) var(--spacing);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metrics-stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.metrics-stat-card__label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Card container */
+.metrics-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+  padding: var(--spacing-lg);
+}
+
+.metrics-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.metrics-card__title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  margin: 0 0 var(--spacing);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.metrics-card__header .metrics-card__title {
+  margin-bottom: 0;
+}
+
+.metrics-card__hint {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.metrics-empty {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+/* Rating Timeline */
+.metrics-rating-timeline {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.metrics-rating-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 44px;
+}
+
+.metrics-rating-chip--empty {
+  background: var(--page-bg);
+  color: var(--text-muted);
+}
+
+.metrics-rating-chip--excellent {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.metrics-rating-chip--good {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.metrics-rating-chip--ok {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.metrics-rating-chip--bad {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.metrics-rating-chip--selected {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--primary-ring);
+}
+
+.metrics-rating-chip__week {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metrics-rating-chip__value {
+  font-size: var(--font-base);
+  font-weight: 800;
+}
+
+/* Week Navigator */
+.metrics-week-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.metrics-week-nav__label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Rating Buttons */
+.metrics-rating-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.metrics-rating-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-md);
+  border: 2px solid;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.metrics-rating-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.metrics-rating-btn--excellent {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.metrics-rating-btn--excellent:hover,
+.metrics-rating-btn--excellent.metrics-rating-btn--active {
+  background: var(--success);
+  color: white;
+}
+
+.metrics-rating-btn--good {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.metrics-rating-btn--good:hover,
+.metrics-rating-btn--good.metrics-rating-btn--active {
+  background: var(--primary);
+  color: white;
+}
+
+.metrics-rating-btn--ok {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.metrics-rating-btn--ok:hover,
+.metrics-rating-btn--ok.metrics-rating-btn--active {
+  background: var(--warning);
+  color: white;
+}
+
+.metrics-rating-btn--bad {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.metrics-rating-btn--bad:hover,
+.metrics-rating-btn--bad.metrics-rating-btn--active {
+  background: var(--danger);
+  color: white;
+}
+
+/* Effort Points Table */
+.metrics-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+  min-width: 800px;
+}
+
+.metrics-table th {
+  background: var(--page-bg);
+  font-weight: 700;
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.metrics-table td {
+  padding: 0;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.metrics-table__sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--card-bg);
+  text-align: left !important;
+  min-width: 160px;
+  padding-left: 12px !important;
+}
+
+th.metrics-table__sticky {
+  background: var(--page-bg);
+}
+
+.metrics-table__name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 12px !important;
+  font-weight: 600;
+  color: var(--text);
+  font-size: var(--font-sm);
+}
+
+.metrics-table__netid {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.metrics-table__cell {
+  padding: 0 !important;
+}
+
+.metrics-table__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: var(--font-sm);
+  font-family: inherit;
+  padding: 8px 4px;
+  color: var(--text);
+  transition: background var(--transition);
+  -moz-appearance: textfield;
+}
+
+.metrics-table__input::-webkit-inner-spin-button,
+.metrics-table__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.metrics-table__input:focus {
+  outline: none;
+  background: var(--primary-light);
+}
+
+.metrics-table__input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.metrics-table__total {
+  background: var(--page-bg);
+  font-weight: 800;
+}
+
+.metrics-table__total-cell {
+  font-weight: 700;
+  color: var(--primary);
+  padding: 8px 6px !important;
+  background: rgba(15, 118, 110, 0.04);
+}
+
+.metrics-table tr:hover td {
+  background: rgba(15, 118, 110, 0.02);
+}
+
+.metrics-table tr:hover .metrics-table__sticky {
+  background: rgba(15, 118, 110, 0.04);
+}
+
+/* Charts Row — two-column layout */
+.metrics-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 900px) {
+  .metrics-charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Analytics table (wider min-width not needed) */
+.metrics-analytics-table {
+  min-width: 600px;
+}
+
+.metrics-analytics-table td {
+  padding: 8px 6px;
+}

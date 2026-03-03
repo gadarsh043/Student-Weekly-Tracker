@@ -1,0 +1,435 @@
+/* Attendance — Table grid, cells, import panel */
+
+.attendance-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.attendance-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+}
+
+.attendance-page__header h1 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin: 0;
+}
+
+.attendance-page__controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.attendance-page__team-select {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  border: var(--border);
+  font-size: var(--font-base);
+  background: var(--card-bg);
+  font-family: inherit;
+}
+
+/* Attendance Table */
+.attendance-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+  background: var(--card-bg);
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.attendance-table th {
+  background: var(--page-bg);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.attendance-table__name {
+  text-align: left !important;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 150px;
+}
+
+.attendance-table__netid {
+  text-align: left !important;
+  color: var(--text-muted);
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: var(--font-xs);
+  min-width: 100px;
+}
+
+.attendance-table tr:hover {
+  background: #fafbfc;
+}
+
+.attendance-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Attendance Cell */
+.att-cell {
+  width: 36px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  font-family: inherit;
+  min-width: 36px;
+}
+
+.att-cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.att-cell--present {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.att-cell--absent {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.att-cell--excused {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.att-cell--empty {
+  background: #f1f5f9;
+  color: var(--text-muted);
+}
+
+/* Summary stats */
+.attendance-summary {
+  display: flex;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.attendance-stat {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  border: var(--border);
+  background: var(--card-bg);
+  font-size: var(--font-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.attendance-stat__value {
+  font-size: var(--font-lg);
+  font-weight: 700;
+}
+
+.attendance-stat__label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+/* CSV Import Panel */
+.csv-import {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+.csv-import__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing);
+}
+
+.csv-import__header h3 {
+  font-size: var(--font-md);
+  font-weight: 600;
+  margin: 0;
+}
+
+.csv-import__dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.csv-import__dropzone:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.csv-import__preview {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  border: var(--border);
+  margin: var(--spacing) 0;
+}
+
+.csv-import__preview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-xs);
+}
+
+.csv-import__preview th,
+.csv-import__preview td {
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.csv-import__preview th {
+  background: var(--page-bg);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.csv-import__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+.csv-import__count {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Grades Page */
+.grades-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.grades-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.grades-page__header h1 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin: 0;
+}
+
+.grades-page__sub {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+}
+
+.grades-page__controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+/* Stats */
+.grades-stats {
+  display: flex;
+  gap: var(--spacing);
+  flex-wrap: wrap;
+}
+
+.grades-stat {
+  padding: var(--spacing) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+  flex: 1;
+}
+
+.grades-stat__value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.grades-stat__label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Weights Panel */
+.grades-weights__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin: var(--spacing) 0;
+}
+
+@media (max-width: 640px) {
+  .grades-weights__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grades-weights__input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.grades-weights__slider {
+  flex: 1;
+  accent-color: var(--primary);
+  height: 6px;
+}
+
+.grades-weights__value {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 40px;
+  text-align: right;
+}
+
+.grades-weights__note {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin: 0;
+  padding-top: var(--spacing-sm);
+  border-top: var(--border);
+}
+
+/* Grades Table */
+.grades-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  box-shadow: var(--card-shadow);
+  background: var(--card-bg);
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+  min-width: 700px;
+}
+
+.grades-table th {
+  background: var(--page-bg);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.grades-table__sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition);
+}
+
+.grades-table__sortable:hover {
+  color: var(--primary);
+}
+
+.grades-table td {
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 500;
+}
+
+.grades-table tr:hover td {
+  background: rgba(15, 118, 110, 0.02);
+}
+
+.grades-table tr:last-child td {
+  border-bottom: none;
+}
+
+.grades-table__name {
+  text-align: left !important;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.grades-table__netid {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+.grades-table__team {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.grades-table__grade-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
