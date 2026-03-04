@@ -220,10 +220,13 @@ export function useWeeks(teamId, userId, myTeam) {
             await supabase.storage.from("weekly-reports").remove([oldFilePath]);
           }
 
+          const mimeType = file.type || "application/octet-stream";
           const { error: uploadError } = await supabase.storage
             .from("weekly-reports")
             .upload(filePath, file, {
-              contentType: file.type || "application/octet-stream",
+              contentType: mimeType,
+              cacheControl: "3600",
+              upsert: true,
             });
 
           if (uploadError) throw uploadError;

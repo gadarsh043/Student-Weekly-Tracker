@@ -8,6 +8,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Horizontal week timeline** with date ranges and holiday markers
 - **Weekly report fields** — goal, help request, work done, team leader, meeting minutes, comments
 - **Document submission** — upload weekly reports as PDF, PPT, PPTX, DOC, DOCX, or TXT (stored in Supabase Storage)
+- **Inline document viewer** — view uploaded documents directly in a new browser tab (no download required)
 - **Per-week download** — download individual week reports as PDF
 - **Download all** — export all weeks as a ZIP archive (includes generated PDFs + uploaded documents)
 - **Read-only project details** — students see project info but cannot edit
@@ -19,7 +20,9 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Team satisfaction rating** — rate team performance as Excellent, Good, Ok, or Bad
 - **Team leader dropdown** — select the week's team leader from the student roster
 - **Status management** — set week status (Pending, Submitted, Late, Reviewed)
-- **Editable project details** — title, overview, meeting link/time, project links
+- **Editable project details** — title, overview, meeting link/time, project links with open button
+- **Link access tracking** — toggle button per link to mark whether you have access (green) or not (gray), persisted in the database
+- **Roster management** — add, move, or remove students from team rosters directly in the admin panel
 
 ### Grades Page (Admin)
 - **Auto-generated letter grades** — calculated from attendance rate, avg hours, and contribution scores

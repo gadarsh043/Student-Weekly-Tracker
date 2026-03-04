@@ -126,6 +126,59 @@
   background: var(--primary-light);
 }
 
+/* Access toggle button (admin editor) */
+.links-editor__access {
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: #f1f5f9;
+  color: var(--text-muted);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+  min-width: 70px;
+  text-align: center;
+}
+
+.links-editor__access:hover {
+  border-color: #94a3b8;
+}
+
+.links-editor__access--yes {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #86efac;
+}
+
+.links-editor__access--yes:hover {
+  background: #bbf7d0;
+  border-color: #4ade80;
+}
+
+/* Access dot (student read-only view) */
+.links-access-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  flex-shrink: 0;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.links-access-dot--yes {
+  background: #22c55e;
+}
+
+.readonly-field--link {
+  display: flex;
+  align-items: center;
+}
+
 /* Project actions row */
 .project-card__actions {
   display: flex;

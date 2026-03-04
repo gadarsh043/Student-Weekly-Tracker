@@ -23,7 +23,7 @@ export default function ProjectCard({
   const links = projectLinks ?? [];
 
   const handleAddLink = () => {
-    onLinksChange([...links, { label: '', url: '' }]);
+    onLinksChange([...links, { label: '', url: '', hasAccess: false }]);
   };
 
   const handleRemoveLink = (index) => {
@@ -33,6 +33,13 @@ export default function ProjectCard({
   const handleLinkChange = (index, field, value) => {
     const updated = links.map((link, i) =>
       i === index ? { ...link, [field]: value } : link
+    );
+    onLinksChange(updated);
+  };
+
+  const toggleAccess = (index) => {
+    const updated = links.map((link, i) =>
+      i === index ? { ...link, hasAccess: !link.hasAccess } : link
     );
     onLinksChange(updated);
   };
@@ -126,6 +133,14 @@ export default function ProjectCard({
                 <span className="field-label">Project Links</span>
                 {links.map((link, idx) => (
                   <div key={idx} className="links-editor__row">
+                    <button
+                      type="button"
+                      className={`links-editor__access ${link.hasAccess ? 'links-editor__access--yes' : ''}`}
+                      onClick={() => toggleAccess(idx)}
+                      title={link.hasAccess ? 'You have access' : 'No access — click to toggle'}
+                    >
+                      {link.hasAccess ? 'Access' : 'No Access'}
+                    </button>
                     <input
                       className="field-input links-editor__label-input"
                       type="text"
@@ -186,23 +201,27 @@ export default function ProjectCard({
                   <div className="readonly-field">
                     {meetingLink ? (
                       <a href={meetingLink} target="_blank" rel="noreferrer">{meetingLink}</a>
-                    ) : '—'}
+                    ) : '\u2014'}
                   </div>
                 </div>
                 <div className="field-group">
                   <span className="field-label">Meeting Time</span>
-                  <div className="readonly-field">{meetingTime || '—'}</div>
+                  <div className="readonly-field">{meetingTime || '\u2014'}</div>
                 </div>
               </div>
               {links.length > 0 && (
                 <div className="field-group">
                   <span className="field-label">Project Links</span>
                   {links.map((link, idx) => (
-                    <div key={idx} className="readonly-field">
+                    <div key={idx} className="readonly-field readonly-field--link">
+                      <span
+                        className={`links-access-dot ${link.hasAccess ? 'links-access-dot--yes' : ''}`}
+                        title={link.hasAccess ? 'Admin has access' : 'Admin does not have access'}
+                      />
                       {link.label && <strong>{link.label}: </strong>}
                       {link.url ? (
                         <a href={link.url} target="_blank" rel="noreferrer">{link.url}</a>
-                      ) : '—'}
+                      ) : '\u2014'}
                     </div>
                   ))}
                 </div>
