@@ -179,6 +179,66 @@
   align-items: center;
 }
 
+/* Team Documents section */
+.project-card__docs {
+  padding-top: var(--spacing);
+  border-top: var(--border);
+}
+
+.project-card__docs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.project-card__docs-empty {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  margin: 0;
+}
+
+.project-card__docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.project-card__doc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--page-bg);
+  gap: var(--spacing-sm);
+}
+
+.project-card__doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.project-card__doc-label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.project-card__doc-meta {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+.project-card__doc-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
 /* Project actions row */
 .project-card__actions {
   display: flex;

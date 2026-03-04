@@ -5,12 +5,10 @@ A TA management tool for tracking weekly progress of senior design project teams
 ## Features
 
 ### Weekly Tracker (Student View)
-- **Horizontal week timeline** with date ranges and holiday markers
-- **Weekly report fields** — goal, help request, work done, team leader, meeting minutes, comments
-- **Document submission** — upload weekly reports as PDF, PPT, PPTX, DOC, DOCX, or TXT (stored in Supabase Storage)
-- **Inline document viewer** — view uploaded documents directly in a new browser tab (no download required)
+- **Horizontal week timeline** — date-based coloring: green (past), blue (current), gray (future), yellow (holiday)
+- **Weekly report fields** — team leader dropdown, comments
 - **Per-week download** — download individual week reports as PDF
-- **Download all** — export all weeks as a ZIP archive (includes generated PDFs + uploaded documents)
+- **Team documents** — view uploaded team documents in a new browser tab
 - **Read-only project details** — students see project info but cannot edit
 
 ### Weekly Tracker (Admin/TA Tools)
@@ -19,8 +17,9 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Contribution scoring** — rate each student's contribution on a 1-10 scale
 - **Team satisfaction rating** — rate team performance as Excellent, Good, Ok, or Bad
 - **Team leader dropdown** — select the week's team leader from the student roster
-- **Status management** — set week status (Pending, Submitted, Late, Reviewed)
 - **Editable project details** — title, overview, meeting link/time, project links with open button
+- **Team document management** — upload, view, and delete team-level documents (stored in Supabase Storage under `teams/{code}/docs/`)
+- **Download all documents** — export all team documents as a ZIP archive
 - **Link access tracking** — toggle button per link to mark whether you have access (green) or not (gray), persisted in the database
 - **Roster management** — add, move, or remove students from team rosters directly in the admin panel
 
@@ -136,6 +135,7 @@ CREATE TABLE teams (
   project_title text,
   project_overview text,
   links jsonb DEFAULT '[]',
+  documents jsonb DEFAULT '[]',
   meeting_link text,
   meeting_time text,
   total_weeks integer NOT NULL DEFAULT 11,
@@ -345,7 +345,7 @@ src/
   pages/            Home, Admin, Grades, Metrics
   components/
     layout/         AppShell, TopNav, Sidebar, PageLayout
-    dashboard/      WeekTimeline, WeekDetailPanel, SubmissionActions
+    dashboard/      WeekTimeline, WeekDetailPanel
     project/        ProjectCard, TeamMembersList
     profile/        ProfileCard, ProfileEditModal
     admin/          CsvImportPanel
@@ -364,6 +364,9 @@ If upgrading from an earlier version:
 -- Add contribution points column if not exists
 ALTER TABLE student_effort_points
 ADD COLUMN IF NOT EXISTS contribution_points numeric NOT NULL DEFAULT 0;
+
+-- Add team-level documents column
+ALTER TABLE teams ADD COLUMN IF NOT EXISTS documents jsonb DEFAULT '[]';
 
 -- Create semester config table
 CREATE TABLE IF NOT EXISTS semester_config (

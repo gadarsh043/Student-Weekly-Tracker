@@ -15,8 +15,13 @@ export default function ProjectCard({
   onMeetingTimeChange,
   onSave,
   saving,
+  // Team documents
+  teamDocuments = [],
+  onDocUpload,
+  onDocView,
+  onDocDelete,
+  uploadingDoc,
   onDownloadAll,
-  downloadingAll,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -64,9 +69,8 @@ export default function ProjectCard({
                 e.stopPropagation();
                 onDownloadAll();
               }}
-              disabled={downloadingAll}
             >
-              {downloadingAll ? 'Downloading...' : 'Download All'}
+              Download All
             </button>
           )}
           <span className="project-card__chevron">
@@ -228,6 +232,59 @@ export default function ProjectCard({
               )}
             </div>
           )}
+
+          {/* Team Documents — visible to both admin and students */}
+          <div className="project-card__docs">
+            <div className="project-card__docs-header">
+              <span className="field-label">Team Documents</span>
+              {onDocUpload && (
+                <button
+                  type="button"
+                  className="links-editor__add"
+                  onClick={onDocUpload}
+                  disabled={uploadingDoc}
+                >
+                  {uploadingDoc ? 'Uploading...' : '+ Add Document'}
+                </button>
+              )}
+            </div>
+            {teamDocuments.length === 0 ? (
+              <p className="project-card__docs-empty">No documents uploaded yet.</p>
+            ) : (
+              <div className="project-card__docs-list">
+                {teamDocuments.map((doc, idx) => (
+                  <div key={idx} className="project-card__doc-row">
+                    <div className="project-card__doc-info">
+                      <span className="project-card__doc-label">{doc.label}</span>
+                      <span className="project-card__doc-meta">
+                        {doc.type?.toUpperCase()} &middot; {new Date(doc.uploaded_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="project-card__doc-actions">
+                      {onDocView && (
+                        <button
+                          type="button"
+                          className="btn btn--secondary btn--sm"
+                          onClick={() => onDocView(doc)}
+                        >
+                          View
+                        </button>
+                      )}
+                      {onDocDelete && (
+                        <button
+                          type="button"
+                          className="links-editor__remove"
+                          onClick={() => onDocDelete(doc)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

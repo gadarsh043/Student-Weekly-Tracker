@@ -1,23 +1,13 @@
-import SubmissionActions from './SubmissionActions';
-import { RATING_OPTIONS, RATING_COLORS } from '../../utils/constants';
+import { RATING_OPTIONS } from '../../utils/constants';
 
 export default function WeekDetailPanel({
   selectedWeek,
-  editingGoal,
-  editingRequest,
   editingReport,
-  onGoalChange,
-  onRequestChange,
   onReportChange,
   onSave,
-  onUpload,
-  onViewPdf,
-  onDeletePdf,
   onDownloadWeek,
   saving,
-  uploading,
   isAdmin,
-  // New props from useWeekPanel
   rosterStudents = [],
   attendance = {},
   effortPoints = {},
@@ -25,7 +15,6 @@ export default function WeekDetailPanel({
   onAttendanceChange,
   onEffortChange,
   onRatingChange,
-  // Contribution points
   contributionPoints = {},
   onContributionChange,
 }) {
@@ -55,56 +44,11 @@ export default function WeekDetailPanel({
               Download
             </button>
           )}
-          <span className={`week-panel__status week-panel__status--${selectedWeek.report?.status || 'pending'}`}>
-            {selectedWeek.report?.status || 'pending'}
-          </span>
         </div>
       </div>
 
       <div className="week-panel__content">
-        {/* Goals & Request */}
-        <div className="week-panel__row">
-          <div className="field-group">
-            <span className="field-label">Goal</span>
-            <textarea
-              className="field-textarea"
-              value={editingGoal ?? ''}
-              onChange={(e) => onGoalChange(e.target.value)}
-              rows={3}
-              placeholder="What is the goal for this week?"
-            />
-          </div>
-          <div className="field-group">
-            <span className="field-label">Request</span>
-            <textarea
-              className="field-textarea"
-              value={editingRequest ?? ''}
-              onChange={(e) => onRequestChange(e.target.value)}
-              rows={3}
-              placeholder="Any requests or blockers?"
-            />
-          </div>
-        </div>
-
-        {isAdmin && (
-          <div className="field-group" style={{ maxWidth: 240 }}>
-            <span className="field-label">Status</span>
-            <select
-              className="field-select"
-              value={editingReport?.status || 'pending'}
-              onChange={(e) => onReportChange({ ...editingReport, status: e.target.value })}
-            >
-              <option value="pending">Pending</option>
-              <option value="submitted">Submitted</option>
-              <option value="late">Late</option>
-              <option value="reviewed">Reviewed</option>
-            </select>
-          </div>
-        )}
-
-        {/* Report fields */}
-        <div className="week-panel__divider" />
-
+        {/* Team Leader & Comments */}
         <div className="week-panel__row">
           <div className="field-group">
             <span className="field-label">Team Leader This Week</span>
@@ -136,34 +80,7 @@ export default function WeekDetailPanel({
             )}
           </div>
           <div className="field-group">
-            <span className="field-label">Minutes of Meeting (MoM)</span>
-            <textarea
-              className="field-textarea"
-              value={editingReport?.mom_meeting ?? ''}
-              onChange={(e) =>
-                onReportChange({ ...editingReport, mom_meeting: e.target.value })
-              }
-              rows={3}
-              placeholder="Meeting notes..."
-            />
-          </div>
-        </div>
-
-        <div className="week-panel__row">
-          <div className="field-group">
-            <span className="field-label">Work Done</span>
-            <textarea
-              className="field-textarea"
-              value={editingReport?.work_done ?? ''}
-              onChange={(e) =>
-                onReportChange({ ...editingReport, work_done: e.target.value })
-              }
-              rows={3}
-              placeholder="Summary of work completed..."
-            />
-          </div>
-          <div className="field-group">
-            <span className="field-label">Weekly Report / Comments</span>
+            <span className="field-label">Comments</span>
             <textarea
               className="field-textarea"
               value={editingReport?.comments ?? ''}
@@ -171,31 +88,8 @@ export default function WeekDetailPanel({
                 onReportChange({ ...editingReport, comments: e.target.value })
               }
               rows={3}
-              placeholder="Additional comments..."
+              placeholder="Weekly comments..."
             />
-          </div>
-        </div>
-
-        {/* Submission */}
-        <div className="week-panel__divider" />
-
-        <div className="field-group">
-          <span className="field-label">Document Submission</span>
-          <SubmissionActions
-            week={selectedWeek}
-            onUpload={onUpload}
-            onView={onViewPdf}
-            onDelete={onDeletePdf}
-            uploading={uploading}
-          />
-          <div className="week-panel__file-status">
-            {selectedWeek.report?.file_path ? (
-              <span className="week-panel__file-name">
-                Uploaded: {selectedWeek.report.file_path.split('/').pop()}
-              </span>
-            ) : (
-              <span className="week-panel__no-file">No file uploaded yet</span>
-            )}
           </div>
         </div>
 

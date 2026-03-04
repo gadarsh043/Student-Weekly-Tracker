@@ -70,6 +70,9 @@ function Home() {
   const [meetingTime, setMeetingTime] = useState("");
   const [savingProject, setSavingProject] = useState(false);
 
+  // Team documents state
+  const [teamDocuments, setTeamDocuments] = useState([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   useEffect(() => {
     setProjectTitle(myTeam?.project_title ?? "");
     setProjectOverview(myTeam?.project_overview ?? "");
@@ -78,6 +81,9 @@ function Home() {
     );
     setMeetingLink(myTeam?.meeting_link ?? "");
     setMeetingTime(myTeam?.meeting_time ?? "");
+    setTeamDocuments(
+      myTeam?.documents && Array.isArray(myTeam.documents) ? myTeam.documents : []
+    );
     if (myTeam?.id) {
       loadTeamMembers(myTeam.id);
       if (myTeam.code) loadRosterMembers(myTeam.code);
@@ -106,6 +112,132 @@ function Home() {
       setMessage("Project saved.");
     }
     setSavingProject(false);
+  };
+
+  // ---------- Team document handlers ----------
+
+  const handleDocUpload = async () => {
+    if (!myTeam) return;
+    const label = prompt("Enter a label for this document (e.g. Week 3 Report, Design Doc):");
+    if (!label) return;
+
+    // Trigger file picker
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf,.ppt,.pptx,.doc,.docx,.txt,.xlsx,.xls,.csv,.png,.jpg,.jpeg";
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setUploadingDoc(true);
+      const teamCode = myTeam.code || `team-${myTeam.id}`;
+      const timestamp = Date.now();
+      const filePath = `teams/${teamCode}/docs/${timestamp}-${file.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("weekly-reports")
+        .upload(filePath, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        setMessage("Upload failed: " + uploadError.message);
+        setUploadingDoc(false);
+        return;
+      }
+
+      const newDoc = {
+        label,
+        file_path: filePath,
+        type: file.name.split(".").pop().toLowerCase(),
+        uploaded_at: new Date().toISOString(),
+      };
+      const updatedDocs = [...teamDocuments, newDoc];
+
+      const { error: dbError } = await supabase
+        .from("teams")
+        .update({ documents: updatedDocs })
+        .eq("id", myTeam.id);
+
+      if (dbError) {
+        console.error("DB error:", dbError);
+        setMessage("Failed to save document metadata.");
+      } else {
+        setTeamDocuments(updatedDocs);
+        setMyTeam({ ...myTeam, documents: updatedDocs });
+        setMessage("Document uploaded.");
+      }
+      setUploadingDoc(false);
+    };
+    input.click();
+  };
+
+  const handleDocView = async (doc) => {
+    const { data, error } = await supabase.storage
+      .from("weekly-reports")
+      .createSignedUrl(doc.file_path, 600);
+
+    if (error || !data?.signedUrl) {
+      setMessage("Failed to get document URL.");
+      return;
+    }
+    window.open(data.signedUrl, "_blank");
+  };
+
+  const handleDocDelete = async (doc) => {
+    if (!myTeam) return;
+    if (!confirm(`Delete "${doc.label}"?`)) return;
+
+    const { error: storageError } = await supabase.storage
+      .from("weekly-reports")
+      .remove([doc.file_path]);
+
+    if (storageError) {
+      console.error("Storage delete error:", storageError);
+    }
+
+    const updatedDocs = teamDocuments.filter((d) => d.file_path !== doc.file_path);
+    const { error: dbError } = await supabase
+      .from("teams")
+      .update({ documents: updatedDocs })
+      .eq("id", myTeam.id);
+
+    if (dbError) {
+      setMessage("Failed to update document list.");
+    } else {
+      setTeamDocuments(updatedDocs);
+      setMyTeam({ ...myTeam, documents: updatedDocs });
+      setMessage("Document deleted.");
+    }
+  };
+
+  const handleDownloadAllDocs = async () => {
+    if (!myTeam || teamDocuments.length === 0) return;
+    setMessage("Preparing ZIP...");
+
+    const JSZip = (await import("jszip")).default;
+    const zip = new JSZip();
+
+    for (const doc of teamDocuments) {
+      const { data, error } = await supabase.storage
+        .from("weekly-reports")
+        .download(doc.file_path);
+
+      if (!error && data) {
+        const ext = doc.type || "bin";
+        const safeName = (doc.label || "doc").replace(/[^a-zA-Z0-9-_ ]/g, "");
+        zip.file(`${safeName}.${ext}`, data);
+      }
+    }
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const teamName = (myTeam.name || "team").replace(/[^a-zA-Z0-9-_]/g, "-");
+    a.download = `${teamName}-documents.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setMessage(null);
   };
 
   const handleJoinTeam = async (teamId) => {
@@ -266,8 +398,12 @@ function Home() {
             onMeetingTimeChange={setMeetingTime}
             onSave={saveProjectDetails}
             saving={savingProject}
-            onDownloadAll={weekProps.handleDownloadAll}
-            downloadingAll={weekProps.downloadingAll}
+            teamDocuments={teamDocuments}
+            onDocUpload={isAdmin ? handleDocUpload : null}
+            onDocView={handleDocView}
+            onDocDelete={isAdmin ? handleDocDelete : null}
+            uploadingDoc={uploadingDoc}
+            onDownloadAll={teamDocuments.length > 0 ? handleDownloadAllDocs : null}
           />
 
           <WeekTimeline
@@ -280,19 +416,11 @@ function Home() {
           {weekProps.selectedWeek && (
             <WeekDetailPanel
               selectedWeek={weekProps.selectedWeek}
-              editingGoal={weekProps.editingGoal}
-              editingRequest={weekProps.editingRequest}
               editingReport={weekProps.editingReport}
-              onGoalChange={weekProps.setEditingGoal}
-              onRequestChange={weekProps.setEditingRequest}
               onReportChange={weekProps.setEditingReport}
               onSave={handleSaveWeek}
-              onUpload={() => weekProps.handleUploadClick(weekProps.selectedWeek)}
-              onViewPdf={() => weekProps.handleViewReportClick(weekProps.selectedWeek)}
-              onDeletePdf={() => weekProps.handleDeletePdfClick(weekProps.selectedWeek)}
               onDownloadWeek={weekProps.handleDownloadWeek}
               saving={weekProps.savingWeek}
-              uploading={weekProps.uploading}
               isAdmin={isAdmin}
               rosterStudents={isAdmin ? weekPanel.rosterStudents : []}
               attendance={isAdmin ? weekPanel.attendance : {}}

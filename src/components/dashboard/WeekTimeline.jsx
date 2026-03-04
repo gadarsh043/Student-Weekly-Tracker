@@ -1,19 +1,17 @@
 export default function WeekTimeline({ weeks, selectedWeek, onSelectWeek, weekDates = [] }) {
-  const statusClass = (status) => {
-    switch (status) {
-      case 'submitted':
-        return 'timeline__button--submitted';
-      case 'reviewed':
-        return 'timeline__button--reviewed';
-      case 'late':
-        return 'timeline__button--late';
-      default:
-        return 'timeline__button--pending';
-    }
-  };
+  const today = new Date().toISOString().split('T')[0];
 
   const getWeekDate = (weekNumber) =>
     weekDates.find((d) => d.weekNumber === weekNumber);
+
+  const timeClass = (weekNumber) => {
+    const dateInfo = getWeekDate(weekNumber);
+    if (!dateInfo) return 'timeline__button--future';
+    if (dateInfo.isHoliday) return 'timeline__button--holiday';
+    if (dateInfo.endDate < today) return 'timeline__button--past';
+    if (dateInfo.startDate <= today && today <= dateInfo.endDate) return 'timeline__button--current';
+    return 'timeline__button--future';
+  };
 
   return (
     <div className="timeline">
@@ -21,20 +19,16 @@ export default function WeekTimeline({ weeks, selectedWeek, onSelectWeek, weekDa
         <h3 className="timeline__title">Weekly Timeline</h3>
         <div className="timeline__legend">
           <span className="timeline__legend-item">
-            <span className="timeline__legend-dot timeline__legend-dot--submitted" />
-            Submitted
+            <span className="timeline__legend-dot timeline__legend-dot--past" />
+            Past
           </span>
           <span className="timeline__legend-item">
-            <span className="timeline__legend-dot timeline__legend-dot--reviewed" />
-            Reviewed
+            <span className="timeline__legend-dot timeline__legend-dot--current" />
+            Current
           </span>
           <span className="timeline__legend-item">
-            <span className="timeline__legend-dot timeline__legend-dot--late" />
-            Late
-          </span>
-          <span className="timeline__legend-item">
-            <span className="timeline__legend-dot timeline__legend-dot--pending" />
-            Pending
+            <span className="timeline__legend-dot timeline__legend-dot--future" />
+            Upcoming
           </span>
         </div>
       </div>
@@ -53,7 +47,7 @@ export default function WeekTimeline({ weeks, selectedWeek, onSelectWeek, weekDa
                 className={`timeline__node${isSelected ? ' timeline__node--selected' : ''}${isHoliday ? ' timeline__node--holiday' : ''}`}
                 onClick={() => onSelectWeek(week)}
               >
-                <div className={`timeline__button ${isHoliday ? 'timeline__button--holiday' : statusClass(week.report?.status)}`}>
+                <div className={`timeline__button ${timeClass(week.week_number)}`}>
                   {week.week_number}
                 </div>
                 <span className="timeline__label">

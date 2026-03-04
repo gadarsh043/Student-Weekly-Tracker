@@ -3,13 +3,6 @@ export const TEAM_COUNT = 13;
 
 export const ATTENDANCE_STATUSES = ['P', 'A', 'Excused', ''];
 
-export const WEEK_STATUSES = {
-  PENDING: 'pending',
-  SUBMITTED: 'submitted',
-  REVIEWED: 'reviewed',
-  LATE: 'late',
-};
-
 export const RATING_OPTIONS = ['Excellent', 'Good', 'Ok', 'Bad'];
 export const RATING_COLORS = {
   Excellent: '#22c55e',

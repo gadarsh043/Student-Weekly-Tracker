@@ -44,10 +44,9 @@
   flex-shrink: 0;
 }
 
-.timeline__legend-dot--submitted { background: var(--success); }
-.timeline__legend-dot--reviewed { background: var(--warning); }
-.timeline__legend-dot--late { background: var(--danger); }
-.timeline__legend-dot--pending { background: #cbd5e1; }
+.timeline__legend-dot--past { background: var(--success); }
+.timeline__legend-dot--current { background: var(--primary); }
+.timeline__legend-dot--future { background: #cbd5e1; }
 
 .timeline__row {
   overflow-x: auto;
@@ -108,25 +107,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.timeline__button--submitted {
+.timeline__button--past {
   border-color: var(--success);
   background: var(--success);
   color: white;
 }
 
-.timeline__button--reviewed {
-  border-color: var(--warning);
-  background: var(--warning);
+.timeline__button--current {
+  border-color: var(--primary);
+  background: var(--primary);
   color: white;
 }
 
-.timeline__button--late {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: white;
-}
-
-.timeline__button--pending {
+.timeline__button--future {
   border-color: #cbd5e1;
   background: white;
   color: var(--text-muted);
@@ -198,35 +191,6 @@
   gap: var(--spacing-sm);
 }
 
-.week-panel__status {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-}
-
-.week-panel__status--pending {
-  background: #f1f5f9;
-  color: var(--text-muted);
-}
-
-.week-panel__status--submitted {
-  background: var(--success-light);
-  color: var(--success);
-}
-
-.week-panel__status--reviewed {
-  background: var(--warning-light);
-  color: var(--warning);
-}
-
-.week-panel__status--late {
-  background: var(--danger-light);
-  color: var(--danger);
-}
-
 .week-panel__content {
   padding: var(--spacing-lg);
   display: flex;
@@ -252,19 +216,6 @@
   margin: var(--spacing-xs) 0;
 }
 
-.week-panel__file-status {
-  margin-top: var(--spacing-sm);
-  font-size: var(--font-sm);
-}
-
-.week-panel__file-name {
-  color: var(--success);
-  font-weight: 500;
-}
-
-.week-panel__no-file {
-  color: var(--text-muted);
-}
 
 .week-panel__save {
   padding: var(--spacing) var(--spacing-lg);
