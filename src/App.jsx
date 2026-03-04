@@ -1,13 +1,21 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import AppRoutes from "./routes/AppRoutes";
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
+import Grades from "./pages/Grades";
+import Metrics from "./pages/Metrics";
+
+const router = createBrowserRouter([
+  { path: "/", element: <Home /> },
+  { path: "/admin", element: <Admin /> },
+  { path: "/grades", element: <Grades /> },
+  { path: "/metrics", element: <Metrics /> },
+]);
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }
