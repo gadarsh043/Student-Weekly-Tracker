@@ -64,6 +64,18 @@ function Home() {
 
   const { weekDates } = useSemesterConfig();
 
+  // Project detail state (must be declared before useMemo that references them)
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectOverview, setProjectOverview] = useState("");
+  const [projectLinks, setProjectLinks] = useState([]);
+  const [meetingLink, setMeetingLink] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
+  const [savingProject, setSavingProject] = useState(false);
+
+  // Team documents state
+  const [teamDocuments, setTeamDocuments] = useState([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
   // ---------- Unsaved-changes detection ----------
 
   const hasProjectChanges = useMemo(() => {
@@ -90,18 +102,6 @@ function Home() {
 
   const isDirty = hasProjectChanges || hasWeekChanges;
   const { blocker, confirmOrRun } = useUnsavedChanges(isDirty);
-
-  // Project detail state
-  const [projectTitle, setProjectTitle] = useState("");
-  const [projectOverview, setProjectOverview] = useState("");
-  const [projectLinks, setProjectLinks] = useState([]);
-  const [meetingLink, setMeetingLink] = useState("");
-  const [meetingTime, setMeetingTime] = useState("");
-  const [savingProject, setSavingProject] = useState(false);
-
-  // Team documents state
-  const [teamDocuments, setTeamDocuments] = useState([]);
-  const [uploadingDoc, setUploadingDoc] = useState(false);
   useEffect(() => {
     setProjectTitle(myTeam?.project_title ?? "");
     setProjectOverview(myTeam?.project_overview ?? "");
