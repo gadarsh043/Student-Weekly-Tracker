@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useTeams } from "../hooks/useTeams";
 import { useWeeks } from "../hooks/useWeeks";
 import { useWeekPanel } from "../hooks/useWeekPanel";
 import { useSemesterConfig } from "../hooks/useSemesterConfig";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import AppShell from "../components/layout/AppShell";
 import TopNav from "../components/layout/TopNav";
 import Sidebar from "../components/layout/Sidebar";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import EmptyState from "../components/common/EmptyState";
 import Toast from "../components/common/Toast";
+import UnsavedChangesModal from "../components/common/UnsavedChangesModal";
 import WeekTimeline from "../components/dashboard/WeekTimeline";
 import WeekDetailPanel from "../components/dashboard/WeekDetailPanel";
 import ProjectCard from "../components/project/ProjectCard";
@@ -61,6 +63,33 @@ function Home() {
   );
 
   const { weekDates } = useSemesterConfig();
+
+  // ---------- Unsaved-changes detection ----------
+
+  const hasProjectChanges = useMemo(() => {
+    if (!myTeam || !isAdmin) return false;
+    const origLinks = myTeam.links && Array.isArray(myTeam.links) ? myTeam.links : [];
+    return (
+      (myTeam.project_title ?? "") !== projectTitle ||
+      (myTeam.project_overview ?? "") !== projectOverview ||
+      JSON.stringify(origLinks) !== JSON.stringify(projectLinks) ||
+      (myTeam.meeting_link ?? "") !== meetingLink ||
+      (myTeam.meeting_time ?? "") !== meetingTime
+    );
+  }, [myTeam, isAdmin, projectTitle, projectOverview, projectLinks, meetingLink, meetingTime]);
+
+  const hasWeekChanges = useMemo(() => {
+    if (!weekProps.selectedWeek || !weekProps.editingReport) return false;
+    const orig = weekProps.selectedWeek.report;
+    const editing = weekProps.editingReport;
+    return (
+      (orig?.comments ?? "") !== (editing.comments ?? "") ||
+      (orig?.team_leader_week ?? "") !== (editing.team_leader_week ?? "")
+    );
+  }, [weekProps.selectedWeek, weekProps.editingReport]);
+
+  const isDirty = hasProjectChanges || hasWeekChanges;
+  const { blocker, confirmOrRun } = useUnsavedChanges(isDirty);
 
   // Project detail state
   const [projectTitle, setProjectTitle] = useState("");
@@ -354,7 +383,7 @@ function Home() {
             teams={teams}
             selectedTeam={myTeam}
             onSelectTeam={(team) => {
-              setMyTeam(team);
+              confirmOrRun(() => setMyTeam(team));
             }}
             isAdmin={isAdmin}
             onJoinTeam={handleJoinTeam}
@@ -409,7 +438,7 @@ function Home() {
           <WeekTimeline
             weeks={weekProps.weeks}
             selectedWeek={weekProps.selectedWeek}
-            onSelectWeek={weekProps.setSelectedWeek}
+            onSelectWeek={(week) => confirmOrRun(() => weekProps.setSelectedWeek(week))}
             weekDates={weekDates}
           />
 
@@ -441,6 +470,7 @@ function Home() {
         </>
       )}
 
+      <UnsavedChangesModal blocker={blocker} />
       <Toast message={message} onDismiss={() => setMessage(null)} />
     </AppShell>
   );
