@@ -57,6 +57,7 @@ function Home() {
   } = useTeams(user?.id, isAdmin);
 
   const weekProps = useWeeks(myTeam?.id, user?.id, myTeam);
+  const { weeks, selectedWeek, setSelectedWeek } = weekProps;
 
   const weekPanel = useWeekPanel(
     myTeam?.id,
@@ -105,6 +106,29 @@ function Home() {
 
   const isDirty = hasProjectChanges || hasWeekChanges;
   const { blocker, confirmOrRun } = useUnsavedChanges(isDirty);
+
+  // When a team loads, default the selected week to the "current"
+  // calendar week based on semester config. This runs once per team
+  // load and won't fight with manual week changes.
+  useEffect(() => {
+    if (!myTeam) return;
+    if (!weeks || weeks.length === 0) return;
+    if (!weekDates || weekDates.length === 0) return;
+    if (selectedWeek) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const currentWeekDate = weekDates.find(
+      (w) => w.startDate <= today && today <= w.endDate
+    );
+    if (!currentWeekDate) return;
+
+    const matchingWeek = weeks.find(
+      (w) => w.week_number === currentWeekDate.weekNumber
+    );
+    if (matchingWeek) {
+      setSelectedWeek(matchingWeek);
+    }
+  }, [myTeam, weeks, weekDates, selectedWeek, setSelectedWeek]);
   useEffect(() => {
     setProjectTitle(myTeam?.project_title ?? "");
     setProjectOverview(myTeam?.project_overview ?? "");

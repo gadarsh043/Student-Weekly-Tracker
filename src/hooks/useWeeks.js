@@ -54,13 +54,12 @@ export function useWeeks(teamId, userId, myTeam) {
 
       setWeeks(mapped);
 
-      // Re-select the same week after reload, or default to first week
+      // Re-select the same week after reload when possible,
+      // but do not force a default (let the caller decide).
       setSelectedWeekState((prev) => {
-        if (prev) {
-          const refreshed = mapped.find((w) => w.id === prev.id);
-          if (refreshed) return refreshed;
-        }
-        return mapped[0] || null;
+        if (!prev) return null;
+        const refreshed = mapped.find((w) => w.id === prev.id);
+        return refreshed || null;
       });
     },
     [teamId]
