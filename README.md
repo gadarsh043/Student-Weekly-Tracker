@@ -26,7 +26,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 ### Grades Page (Admin)
 - **Auto-generated letter grades** — calculated from attendance rate, avg hours, and contribution scores
 - **Configurable weights** — admin-adjustable sliders for how much each metric counts (default: 30% attendance, 30% hours, 40% contribution)
-- **Sortable table** — sort all students by name, NetID, team, or grade
+- **Sortable table** — sort all students by name, team, or grade
 - **Team filtering** — filter the grades view by team
 - **Grade formula** — (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / total weight, mapped to A through F
 
@@ -36,7 +36,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Attendance overview bar chart** — stacked Present/Absent/Excused per week
 - **Satisfaction timeline** — week-by-week team rating chips with inline editing
 - **Effort points table** — editable spreadsheet-style hours + contribution per student
-- **Student analytics table** — name, NetID, total hours, avg hours, attendance rate, weeks active
+- **Student analytics table** — name, total hours, avg hours, attendance rate, weeks active
 
 ### Admin Dashboard
 - **Team management** — create/edit/delete teams, manage team members
@@ -45,11 +45,10 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Semester configuration** — set semester start date, mark holiday weeks (e.g. Spring Break), configure total weeks, auto-calculated week date ranges
 
 ### Authentication
-- **Google OAuth** — sign in with Google accounts
-- **Microsoft/Outlook OAuth** — sign in with university Outlook accounts (Azure AD)
+- **Google OAuth** — sign in with Google accounts via Supabase Auth
 - **Account picker** — always prompts for account selection on login (no auto-reuse of previous credentials)
 - **Auto-matching** — students auto-join their team on first login (NetID matched from email prefix to `student_roster`)
-- **NetID prompt** — if auto-match fails, prompts user to manually enter their NetID
+- **NetID prompt** — if auto-match fails, prompts user to manually enter their NetID (used for roster matching only; NetIDs are not shown in the main UI)
 - **Admin bypass** — admins skip the NetID prompt (set role in Supabase directly)
 - **Role-based access** — admin pages (Grades, Metrics, Admin) restricted to `profile.role === 'admin'`
 
@@ -100,9 +99,8 @@ You can find these values in your Supabase project dashboard under **Settings > 
 #### Authentication
 
 1. In Supabase dashboard, go to **Authentication > Providers**
-2. Enable **Google** provider — add your Google OAuth client ID and secret
-3. Enable **Azure (Microsoft)** provider — register an app in Azure AD, add client ID and secret, set redirect URL
-4. Set the redirect URL for both providers to your app's URL (e.g., `http://localhost:5173`)
+2. Enable the **Google** provider — add your Google OAuth client ID and secret
+3. Set the redirect URL to your app's URL (e.g., `http://localhost:5173`)
 
 #### Database Tables
 
@@ -319,9 +317,9 @@ No NetID is required for admin accounts — the NetID prompt is automatically sk
 
 ## How Students Log In
 
-1. Student visits the app and clicks **Sign in with Google** or **Sign in with Outlook / Microsoft**
+1. Student visits the app and clicks **Sign in with Google**
 2. If their email prefix (netid) matches a `student_roster` entry, they're auto-joined to their team
-3. If no match, they're prompted to enter their NetID manually
+3. If no match, they're prompted to enter their NetID manually (used only for matching to the roster)
 4. If their NetID is in the roster, they're matched and auto-joined
 5. If not in the roster, they can skip and join a team manually from the sidebar
 
@@ -340,7 +338,7 @@ npm run preview   # Preview production build
 src/
   App.jsx           Main app wrapper (AuthProvider + Router)
   main.jsx          Vite entry point (CSS imports + React root)
-  contexts/         AuthContext (Google + Microsoft OAuth, netid prompt, auto-match)
+  contexts/         AuthContext (Google OAuth, netid prompt, auto-match)
   hooks/            useAuth, useTeams, useWeeks, useWeekPanel, useMetrics, useSemesterConfig
   pages/            Home, Admin, Grades, Metrics
   components/
