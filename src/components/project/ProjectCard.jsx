@@ -70,7 +70,7 @@ export default function ProjectCard({
                 onDownloadAll();
               }}
             >
-              Download All
+              Bulk Download Till Last week
             </button>
           )}
           <span className="project-card__chevron">

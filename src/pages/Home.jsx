@@ -558,7 +558,7 @@ function Home() {
             onDocView={handleDocView}
             onDocDelete={isAdmin ? handleDocDelete : null}
             uploadingDoc={uploadingDoc}
-            onDownloadAll={teamDocuments.length > 0 ? handleDownloadAllDocs : null}
+            onDownloadAll={handleDownloadAllDocs}
           />
 
           <WeekTimeline
