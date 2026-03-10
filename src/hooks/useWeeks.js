@@ -123,18 +123,18 @@ export function useWeeks(teamId, userId, myTeam) {
     }
   }, [selectedWeekState, myTeam, userId, editingReport, loadWeeks]);
 
-  // ---------- download single week (PDF) ----------
+  // ---------- week PDF generation (single + blob for ZIP) ----------
 
-  const handleDownloadWeek = useCallback(
-    async (week) => {
-      if (!myTeam || !week) return;
+  const generateWeekPdf = useCallback(
+    async (week, { asBlob = false } = {}) => {
+      if (!myTeam || !week) return null;
 
       const { report } = week;
 
       // ----- Load per-week + to-date data for this team -----
       const teamCode = myTeam.code || "";
       const match = teamCode.match(/T(\d+)/i);
-      const teamIndex = match ? parseInt(match[1]) : null;
+      const teamIndex = match ? parseInt(match[1], 10) : null;
 
       let roster = [];
       let attendanceMap = {};
@@ -277,7 +277,8 @@ export function useWeeks(teamId, userId, myTeam) {
       const mutedColor = "#6b7280";
 
       // Header link: "Please visit this page [Link]"
-      const teamPath = teamCode ? teamCode.toLowerCase() : "";
+      const teamCodeLower = (myTeam.code || "").toLowerCase();
+      const teamPath = teamCodeLower || "";
       const url = teamPath
         ? `https://cs-4485-weekly-tracker.netlify.app/${teamPath}`
         : "https://cs-4485-weekly-tracker.netlify.app/";
@@ -293,7 +294,9 @@ export function useWeeks(teamId, userId, myTeam) {
       // Tno - Project title / team name
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
-      const teamLine = `${teamCode || "Team"} - ${myTeam.project_title || myTeam.name || "Project"}`;
+      const teamLine = `${myTeam.code || "Team"} - ${
+        myTeam.project_title || myTeam.name || "Project"
+      }`;
       doc.text(teamLine, marginX, y);
       y += 6;
 
@@ -415,7 +418,7 @@ export function useWeeks(teamId, userId, myTeam) {
       doc.setTextColor(0, 0, 0);
 
       roster.forEach((s) => {
-        if (y > 230) return; // keep room for analytics + footer
+        if (y > 230) return;
         const name = `${s.first_name || ""} ${s.last_name || ""}`.trim() || "";
         const hrsVal = effortMap[s.netid];
         const hrs = hrsVal != null && hrsVal > 0 ? `${hrsVal.toFixed(1)}h` : "—";
@@ -492,19 +495,39 @@ export function useWeeks(teamId, userId, myTeam) {
       doc.setFontSize(9);
       doc.setTextColor(primaryColor);
       const metricsLine = [
-        `Avg Hours (this week): ${avgHours > 0 ? avgHours.toFixed(1) + "h" : "—"}`,
+        `Avg Hours (this week): ${avgHours > 0 ? `${avgHours.toFixed(1)}h` : "—"}`,
         `Attendance (this week): ${
-          attendanceStatuses.length > 0 ? attendanceRate.toFixed(0) + "%" : "—"
+          attendanceStatuses.length > 0 ? `${attendanceRate.toFixed(0)}%` : "—"
         }`,
         `Rating: ${teamRating || "—"}`,
       ].join("   •   ");
       const metricsLines = doc.splitTextToSize(metricsLine, pageWidth - marginX * 2);
       doc.text(metricsLines, marginX, y);
 
-      const safeTeamName = (myTeam.name || "team").replace(/[^a-zA-Z0-9-_]/g, "-");
-      doc.save(`${safeTeamName}-Week${week.week_number}.pdf`);
+      const weekLabelNumber = String(week.week_number).padStart(2, "0");
+      const filename = `Week ${weekLabelNumber}.pdf`;
+
+      if (asBlob) {
+        const blob = doc.output("blob");
+        return { blob, filename };
+      }
+
+      doc.save(filename);
+      return null;
     },
     [myTeam]
+  );
+
+  const handleDownloadWeek = useCallback(
+    async (week) => {
+      await generateWeekPdf(week, { asBlob: false });
+    },
+    [generateWeekPdf]
+  );
+
+  const buildWeekPdfBlob = useCallback(
+    async (week) => generateWeekPdf(week, { asBlob: true }),
+    [generateWeekPdf]
   );
 
   // ---------- auto-load when teamId changes ----------
@@ -527,6 +550,7 @@ export function useWeeks(teamId, userId, myTeam) {
     setEditingReport,
     saveWeekDetails,
     handleDownloadWeek,
+    buildWeekPdfBlob,
     loadWeeks,
   };
 }

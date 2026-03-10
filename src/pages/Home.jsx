@@ -292,12 +292,20 @@ function Home() {
   };
 
   const handleDownloadAllDocs = async () => {
-    if (!myTeam || teamDocuments.length === 0) return;
+    if (!myTeam) return;
     setMessage("Preparing ZIP...");
 
     const JSZip = (await import("jszip")).default;
     const zip = new JSZip();
 
+    const projectTitleSafe = (projectTitle || myTeam.project_title || myTeam.name || "Project")
+      .replace(/[^a-zA-Z0-9-_ ]/g, "")
+      .trim();
+    const teamLabel = myTeam.code || myTeam.name || "Team";
+    const folderName = `${teamLabel} - ${projectTitleSafe}`.trim();
+    const teamFolder = zip.folder(folderName) || zip;
+
+    // Team documents at the root of the team folder
     for (const doc of teamDocuments) {
       const { data, error } = await supabase.storage
         .from("weekly-reports")
@@ -306,7 +314,38 @@ function Home() {
       if (!error && data) {
         const ext = doc.type || "bin";
         const safeName = (doc.label || "doc").replace(/[^a-zA-Z0-9-_ ]/g, "");
-        zip.file(`${safeName}.${ext}`, data);
+        teamFolder.file(`${safeName}.${ext}`, data);
+      }
+    }
+
+    // Weekly PDFs in weekly-reports/
+    const weeklyFolder = teamFolder.folder("weekly-reports");
+    if (weeklyFolder && weeks && weeks.length > 0 && weekDates && weekDates.length > 0) {
+      const today = new Date().toISOString().split("T")[0];
+
+      const weekDateMap = new Map(
+        weekDates.map((w) => [w.weekNumber, { startDate: w.startDate, endDate: w.endDate }])
+      );
+
+      const pastWeeks = weeks.filter((w) => {
+        const dates = weekDateMap.get(w.week_number);
+        if (!dates) return false;
+        return dates.endDate < today;
+      });
+
+      for (const week of pastWeeks) {
+        const pdfResult = await weekProps.buildWeekPdfBlob(week);
+        if (!pdfResult) continue;
+
+        const dates = weekDateMap.get(week.week_number);
+        const weekLabelNumber = String(week.week_number).padStart(2, "0");
+        const dateSuffix =
+          dates && dates.startDate && dates.endDate
+            ? ` - ${dates.startDate} to ${dates.endDate}`
+            : "";
+        const fileName = `Week ${weekLabelNumber}${dateSuffix}.pdf`;
+
+        weeklyFolder.file(fileName, pdfResult.blob);
       }
     }
 
@@ -314,11 +353,39 @@ function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const teamName = (myTeam.name || "team").replace(/[^a-zA-Z0-9-_]/g, "-");
-    a.download = `${teamName}-documents.zip`;
+    const zipName = (myTeam.code || myTeam.name || "team").replace(/[^a-zA-Z0-9-_]/g, "-");
+    a.download = `${zipName}-all-docs-and-weekly-reports.zip`;
     a.click();
     URL.revokeObjectURL(url);
     setMessage(null);
+  };
+
+  const handleDownloadWeekPdf = async (week) => {
+    if (!week) return;
+
+    // If we don't have semester dates yet, fall back to the hook's default behavior
+    if (!weekDates || weekDates.length === 0) {
+      await weekProps.handleDownloadWeek(week);
+      return;
+    }
+
+    const dates = weekDates.find((w) => w.weekNumber === week.week_number);
+    const weekLabelNumber = String(week.week_number).padStart(2, "0");
+    const dateSuffix =
+      dates && dates.startDate && dates.endDate
+        ? ` - ${dates.startDate} to ${dates.endDate}`
+        : "";
+    const fileName = `Week ${weekLabelNumber}${dateSuffix}.pdf`;
+
+    const pdfResult = await weekProps.buildWeekPdfBlob(week);
+    if (!pdfResult) return;
+
+    const blobUrl = URL.createObjectURL(pdfResult.blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(blobUrl);
   };
 
   const handleJoinTeam = async (teamId) => {
@@ -507,7 +574,7 @@ function Home() {
               editingReport={weekProps.editingReport}
               onReportChange={weekProps.setEditingReport}
               onSave={handleSaveWeek}
-              onDownloadWeek={weekProps.handleDownloadWeek}
+              onDownloadWeek={handleDownloadWeekPdf}
               saving={weekProps.savingWeek}
               isAdmin={isAdmin}
               rosterStudents={isAdmin ? weekPanel.rosterStudents : []}
