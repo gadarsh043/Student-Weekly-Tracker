@@ -521,7 +521,7 @@ function Admin() {
                         {(rosterByTeam[team.id] || []).map((s) => (
                           <li key={s.id} className="admin-member-item">
                             <span>
-                              {s.first_name} {s.last_name} — {s.netid}
+                              {s.first_name} {s.last_name}
                               {s.matched_profile_id && <span className="admin-roster-badge admin-roster-badge--linked"> (linked)</span>}
                               {!s.matched_profile_id && <span className="admin-roster-badge admin-roster-badge--unlinked"> (not signed up)</span>}
                             </span>

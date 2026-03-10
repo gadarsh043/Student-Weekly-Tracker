@@ -333,12 +333,7 @@ function Home() {
 
   if (!sessionChecked || authLoading) return <LoadingSpinner />;
 
-  // Anonymous, read-only viewer:
-  // - If there is a teamCode in the URL, allow viewing that team's page without login.
-  // - If there is no teamCode, keep the existing login gate.
-  const isAnonymousViewer = !user && !!teamCode;
-
-  if (!user && !teamCode) {
+  if (!user) {
     return (
       <div className="login-page">
         <div className="login-card">
@@ -356,6 +351,17 @@ function Home() {
               <span className="login-google-icon" />
               Sign in with Google
             </button>
+            {/* Microsoft/Outlook login — uncomment when Azure provider is configured in Supabase
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={signInWithMicrosoft}
+              style={{ width: "100%" }}
+            >
+              <span className="login-ms-icon" />
+              Sign in with Outlook / Microsoft
+            </button>
+            */}
           </div>
         </div>
       </div>
@@ -407,26 +413,21 @@ function Home() {
     );
   }
 
-  // Admin always sees sidebar; student only if they have no team yet.
-  // Anonymous viewers don't see the team sidebar (they use direct URLs like /t4).
-  const showSidebar = !isAnonymousViewer && (isAdmin || !myTeam);
+  // Admin always sees sidebar; student only if they have no team yet
+  const showSidebar = isAdmin || !myTeam;
 
   return (
     <AppShell
       sidebarOpen={sidebarOpen}
       onToggleSidebar={showSidebar ? () => setSidebarOpen(true) : undefined}
       topNav={
-        isAnonymousViewer
-          ? null
-          : (
-            <TopNav
-              user={user}
-              profile={profile}
-              isAdmin={isAdmin}
-              onLogout={logout}
-              onEditProfile={() => setShowProfileModal(true)}
-            />
-          )
+        <TopNav
+          user={user}
+          profile={profile}
+          isAdmin={isAdmin}
+          onLogout={logout}
+          onEditProfile={() => setShowProfileModal(true)}
+        />
       }
       sidebar={
         showSidebar ? (
@@ -464,7 +465,7 @@ function Home() {
         />
       )}
 
-      {!myTeam && !isAnonymousViewer && (
+      {!myTeam && (
         <EmptyState message="Select a team from the sidebar to get started." />
       )}
 

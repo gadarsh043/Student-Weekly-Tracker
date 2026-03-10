@@ -3,7 +3,7 @@ export default function TeamMembersList({ members, rosterMembers }) {
     (members || []).map((m) => m.netid).filter(Boolean)
   );
 
-  // Roster students who haven't signed up yet (calculated by netid, but netid is not shown)
+  // Roster students who haven't signed up yet
   const unclaimed = (rosterMembers || []).filter(
     (r) => !r.matched_profile_id && !signedUpNetids.has(r.netid)
   );

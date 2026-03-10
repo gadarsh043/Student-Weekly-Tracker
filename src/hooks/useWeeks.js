@@ -416,7 +416,7 @@ export function useWeeks(teamId, userId, myTeam) {
 
       roster.forEach((s) => {
         if (y > 230) return; // keep room for analytics + footer
-        const name = `${s.first_name || ""} ${s.last_name || ""}`.trim() || s.netid;
+        const name = `${s.first_name || ""} ${s.last_name || ""}`.trim() || "";
         const hrsVal = effortMap[s.netid];
         const hrs = hrsVal != null && hrsVal > 0 ? `${hrsVal.toFixed(1)}h` : "—";
         const att = attendanceMap[s.netid] || "—";
