@@ -322,7 +322,6 @@ function Metrics() {
                       <tr key={student.netid}>
                         <td className="metrics-table__sticky metrics-table__name">
                           <span>{student.first_name} {student.last_name}</span>
-                          <span className="metrics-table__netid">{student.netid}</span>
                         </td>
                         {Array.from({ length: TOTAL_WEEKS }, (_, i) => {
                           const w = i + 1;
@@ -366,7 +365,6 @@ function Metrics() {
                   <thead>
                     <tr>
                       <th className="metrics-table__sticky">Name</th>
-                      <th>NetID</th>
                       <th>Total Hours</th>
                       <th>Avg Hours</th>
                       <th>Attendance</th>
@@ -382,7 +380,6 @@ function Metrics() {
                           <td className="metrics-table__sticky metrics-table__name">
                             <span>{s.first_name} {s.last_name}</span>
                           </td>
-                          <td style={{ textAlign: "center", fontSize: "var(--font-xs)", color: "var(--text-muted)" }}>{s.netid}</td>
                           <td style={{ textAlign: "center", fontWeight: 600 }}>{s.totalHours > 0 ? `${s.totalHours.toFixed(1)}h` : "—"}</td>
                           <td style={{ textAlign: "center", fontWeight: 600, color: "var(--primary)" }}>{s.avgHours > 0 ? `${s.avgHours.toFixed(1)}h` : "—"}</td>
                           <td style={{ textAlign: "center", fontWeight: 600, color: s.attendanceRate >= 80 ? "#22c55e" : s.attendanceRate >= 50 ? "#eab308" : "#ef4444" }}>

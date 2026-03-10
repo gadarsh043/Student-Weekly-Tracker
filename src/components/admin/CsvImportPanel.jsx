@@ -46,7 +46,6 @@ export default function CsvImportPanel({ onImport }) {
               <tr>
                 <th>Team</th>
                 <th>Name</th>
-                <th>NetID</th>
               </tr>
             </thead>
             <tbody>
@@ -56,7 +55,6 @@ export default function CsvImportPanel({ onImport }) {
                   <td>
                     {row.firstName} {row.lastName}
                   </td>
-                  <td>{row.netid}</td>
                 </tr>
               ))}
             </tbody>

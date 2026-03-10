@@ -3,7 +3,7 @@ export default function TeamMembersList({ members, rosterMembers }) {
     (members || []).map((m) => m.netid).filter(Boolean)
   );
 
-  // Roster students who haven't signed up yet
+  // Roster students who haven't signed up yet (calculated by netid, but netid is not shown)
   const unclaimed = (rosterMembers || []).filter(
     (r) => !r.matched_profile_id && !signedUpNetids.has(r.netid)
   );
@@ -31,7 +31,6 @@ export default function TeamMembersList({ members, rosterMembers }) {
               </div>
               <div className="member-card__meta">
                 {member.email && <span>{member.email}</span>}
-                {member.netid && <span>NetID: {member.netid}</span>}
               </div>
               {member.role && (
                 <span className="member-card__role">{member.role}</span>
@@ -53,9 +52,7 @@ export default function TeamMembersList({ members, rosterMembers }) {
                 <div className="member-card__name">
                   {student.first_name} {student.last_name}
                 </div>
-                <div className="member-card__meta">
-                  <span>NetID: {student.netid}</span>
-                </div>
+                <div className="member-card__meta" />
                 <span className="member-card__role member-card__role--unclaimed">
                   Unclaimed
                 </span>

@@ -176,9 +176,6 @@ function Grades() {
         case "team":
           cmp = a.team_index - b.team_index || a.last_name.localeCompare(b.last_name);
           break;
-        case "netid":
-          cmp = a.netid.localeCompare(b.netid);
-          break;
         default:
           cmp = 0;
       }
@@ -342,9 +339,6 @@ function Grades() {
                   <th className="grades-table__sortable" onClick={() => handleSort("name")}>
                     Name{sortArrow("name")}
                   </th>
-                  <th className="grades-table__sortable" onClick={() => handleSort("netid")}>
-                    NetID{sortArrow("netid")}
-                  </th>
                   <th className="grades-table__sortable" onClick={() => handleSort("team")}>
                     Team{sortArrow("team")}
                   </th>
@@ -361,7 +355,6 @@ function Grades() {
                 {displayStudents.map((s) => (
                   <tr key={s.netid}>
                     <td className="grades-table__name">{s.first_name} {s.last_name}</td>
-                    <td className="grades-table__netid">{s.netid}</td>
                     <td className="grades-table__team">T{s.team_index}</td>
                     <td style={{ color: s.attendanceRate >= 80 ? "#22c55e" : s.attendanceRate >= 50 ? "#eab308" : "#ef4444" }}>
                       {s.attendanceRate > 0 ? `${s.attendanceRate.toFixed(0)}%` : "—"}

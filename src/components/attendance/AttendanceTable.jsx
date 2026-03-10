@@ -13,7 +13,6 @@ export default function AttendanceTable({ students, onStatusChange }) {
       <thead>
         <tr className="attendance-table__header">
           <th className="attendance-table__name">Name</th>
-          <th className="attendance-table__netid">NetID</th>
           <th>Pitch Deck</th>
           {weekColumns.map((_, i) => (
             <th key={i}>Week {i + 1}</th>
@@ -26,7 +25,6 @@ export default function AttendanceTable({ students, onStatusChange }) {
             <td className="attendance-table__name">
               {student.firstName} {student.lastName}
             </td>
-            <td className="attendance-table__netid">{student.netid}</td>
             <td>
               <AttendanceCell
                 status={student.attendance?.pitchDeck ?? ''}
