@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTeams } from "../hooks/useTeams";
 import { useWeeks } from "../hooks/useWeeks";
@@ -20,6 +21,8 @@ import ProfileEditModal from "../components/profile/ProfileEditModal";
 import { supabase } from "../utils/supabaseClient";
 
 function Home() {
+  const navigate = useNavigate();
+  const { teamCode } = useParams();
   const {
     user,
     profile,
@@ -28,7 +31,7 @@ function Home() {
     loading: authLoading,
     needsNetid,
     signInWithGoogle,
-    signInWithMicrosoft,
+    // signInWithMicrosoft,
     logout,
     updateProfile,
     claimNetid,
@@ -118,6 +121,31 @@ function Home() {
       if (myTeam.code) loadRosterMembers(myTeam.code);
     }
   }, [myTeam?.id]);
+
+  // Keep myTeam in sync when navigating directly to /:teamCode
+  useEffect(() => {
+    if (!teamCode || !teams.length) return;
+    const match = teams.find(
+      (t) => t.code && t.code.toLowerCase() === teamCode.toLowerCase()
+    );
+    if (match && match.id !== myTeam?.id) {
+      confirmOrRun(() => setMyTeam(match));
+    }
+  }, [teamCode, teams, myTeam?.id, setMyTeam, confirmOrRun]);
+
+  // Keep URL in sync with currently selected team
+  useEffect(() => {
+    const currentCode = teamCode ? teamCode.toLowerCase() : null;
+    const desiredCode = myTeam?.code ? myTeam.code.toLowerCase() : null;
+
+    // Only push a new URL when we actually have a selected team
+    // and it doesn't match the current URL segment.
+    if (desiredCode && currentCode !== desiredCode) {
+      navigate(`/${desiredCode}`, { replace: true });
+    }
+    // If there's no selected team, we leave the URL as-is so that
+    // direct navigation like `/t4` can still be resolved once teams load.
+  }, [myTeam?.code, teamCode, navigate]);
 
   const saveProjectDetails = async () => {
     if (!myTeam) return;
@@ -383,7 +411,14 @@ function Home() {
             teams={teams}
             selectedTeam={myTeam}
             onSelectTeam={(team) => {
-              confirmOrRun(() => setMyTeam(team));
+              confirmOrRun(() => {
+                setMyTeam(team);
+                if (team?.code) {
+                  navigate(`/${team.code.toLowerCase()}`);
+                } else {
+                  navigate("/");
+                }
+              });
             }}
             isAdmin={isAdmin}
             onJoinTeam={handleJoinTeam}

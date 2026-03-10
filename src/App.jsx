@@ -7,6 +7,7 @@ import Metrics from "./pages/Metrics";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
+  { path: "/:teamCode", element: <Home /> },
   { path: "/admin", element: <Admin /> },
   { path: "/grades", element: <Grades /> },
   { path: "/metrics", element: <Metrics /> },
