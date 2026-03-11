@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import Admin from "../pages/Admin";
 import Grades from "../pages/Grades";
 import Metrics from "../pages/Metrics";
+import Weekly from "../pages/Weekly";
 
 const AppRoutes = () => {
   return (
@@ -11,6 +12,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<Admin />} />
       <Route path="/grades" element={<Grades />} />
       <Route path="/metrics" element={<Metrics />} />
+      <Route path="/weekly" element={<Weekly />} />
     </Routes>
   );
 };

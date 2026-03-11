@@ -20,6 +20,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Editable project details** — title, overview, meeting link/time, project links with open button
 - **Team document management** — upload, view, and delete team-level documents (stored in Supabase Storage under `teams/{code}/docs/`)
 - **Download all documents** — export all team documents as a ZIP archive
+- **Weekly Export (all teams)** — pick a week and download **one stitched PDF** containing that week’s report for every team (placeholder page for missing submissions)
 - **Link access tracking** — toggle button per link to mark whether you have access (green) or not (gray), persisted in the database
 - **Roster management** — add, move, or remove students from team rosters directly in the admin panel
 
@@ -340,7 +341,7 @@ src/
   main.jsx          Vite entry point (CSS imports + React root)
   contexts/         AuthContext (Google OAuth, netid prompt, auto-match)
   hooks/            useAuth, useTeams, useWeeks, useWeekPanel, useMetrics, useSemesterConfig
-  pages/            Home, Admin, Grades, Metrics
+  pages/            Home, Admin, Grades, Metrics, Weekly (admin stitched PDF export)
   components/
     layout/         AppShell, TopNav, Sidebar, PageLayout
     dashboard/      WeekTimeline, WeekDetailPanel
@@ -349,9 +350,9 @@ src/
     admin/          CsvImportPanel
     attendance/     AttendanceCell, AttendanceTable
     common/         Modal, Toast, LoadingSpinner, EmptyState
-  routes/           AppRoutes (/, /admin, /grades, /metrics)
+  routes/           AppRoutes (legacy; main routing is in `App.jsx`)
   styles/           8 feature-scoped CSS files (BEM naming + CSS custom properties)
-  utils/            supabaseClient, constants (computeWeekDates), csvParser
+  utils/            supabaseClient, constants (computeWeekDates), csvParser, weekPdf
 ```
 
 ## Migration Notes

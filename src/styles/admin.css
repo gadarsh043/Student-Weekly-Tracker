@@ -9,6 +9,47 @@
   gap: var(--spacing-lg);
 }
 
+/* Weekly export page (admin-only) */
+.weekly-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.weekly-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+}
+
+.weekly-page__sub {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+}
+
+.weekly-page__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.weekly-page__hint {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+}
+
+.weekly-page__progress {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+}
+
 .admin-page__header {
   display: flex;
   align-items: center;

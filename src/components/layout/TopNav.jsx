@@ -23,6 +23,7 @@ export default function TopNav({
         <Link to="/" className="topnav__link">Tracker</Link>
         {isAdmin && <Link to="/metrics" className="topnav__link">Metrics</Link>}
         {isAdmin && <Link to="/grades" className="topnav__link">Grades</Link>}
+        {isAdmin && <Link to="/weekly" className="topnav__link">Weekly</Link>}
         {isAdmin && <Link to="/admin" className="topnav__link">Admin</Link>}
       </div>
 
