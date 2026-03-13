@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../utils/supabaseClient";
@@ -9,21 +9,20 @@ import { TOTAL_WEEKS } from "../utils/constants";
 
 const DEFAULT_WEIGHTS = { attendance: 30, hours: 30, contribution: 40 };
 
-function letterGrade(score) {
-  if (score >= 95) return "A+";
-  if (score >= 90) return "A";
-  if (score >= 86) return "A-";
-  if (score >= 83) return "B+";
-  if (score >= 80) return "B";
-  if (score >= 76) return "B-";
-  if (score >= 73) return "C+";
-  if (score >= 70) return "C";
-  if (score >= 66) return "C-";
-  if (score >= 63) return "D+";
-  if (score >= 60) return "D";
-  if (score >= 56) return "D-";
-  return "F";
-}
+const DEFAULT_GRADE_SCALE = [
+  { grade: "A+", min: 95 },
+  { grade: "A", min: 90 },
+  { grade: "A-", min: 86 },
+  { grade: "B+", min: 83 },
+  { grade: "B", min: 80 },
+  { grade: "B-", min: 76 },
+  { grade: "C+", min: 73 },
+  { grade: "C", min: 70 },
+  { grade: "C-", min: 66 },
+  { grade: "D+", min: 63 },
+  { grade: "D", min: 60 },
+  { grade: "D-", min: 56 },
+];
 
 function gradeColor(grade) {
   if (grade.startsWith("A")) return "#22c55e";
@@ -52,6 +51,19 @@ function Grades() {
       else loadData();
     }
   }, [sessionChecked, authLoading, user, isAdmin]);
+
+  const [gradeScale, setGradeScale] = useState(DEFAULT_GRADE_SCALE);
+  const [showGradesConfig, setShowGradesConfig] = useState(false);
+
+  // Compute letter grade from the dynamic scale
+  const computeLetterGrade = useCallback((score) => {
+    // Sort descending by min score to check highest thresholds first
+    const sortedScale = [...gradeScale].sort((a, b) => b.min - a.min);
+    for (const threshold of sortedScale) {
+      if (score >= threshold.min) return threshold.grade;
+    }
+    return "F";
+  }, [gradeScale]);
 
   const loadData = async () => {
     setLoading(true);
@@ -152,11 +164,11 @@ function Grades() {
         ? (attScore * weights.attendance + hoursScore * weights.hours + contribScore * weights.contribution) / totalWeight
         : 0;
 
-      const grade = letterGrade(rawScore);
+      const grade = computeLetterGrade(rawScore);
 
       return { ...s, rawScore, grade };
     });
-  }, [allStudents, weights]);
+  }, [allStudents, weights, computeLetterGrade]);
 
   // Filter and sort
   const displayStudents = useMemo(() => {
@@ -243,6 +255,13 @@ function Grades() {
             </select>
             <button
               type="button"
+              className={`btn ${showGradesConfig ? "btn--primary" : "btn--secondary"} btn--sm`}
+              onClick={() => setShowGradesConfig((v) => !v)}
+            >
+              Grade Scale
+            </button>
+            <button
+              type="button"
               className={`btn ${showWeights ? "btn--primary" : "btn--secondary"} btn--sm`}
               onClick={() => setShowWeights((v) => !v)}
             >
@@ -258,8 +277,8 @@ function Grades() {
             <span className="grades-stat__label">Students</span>
           </div>
           <div className="grades-stat">
-            <span className="grades-stat__value" style={{ color: gradeColor(letterGrade(avgGradeScore)) }}>
-              {letterGrade(avgGradeScore)}
+            <span className="grades-stat__value" style={{ color: gradeColor(computeLetterGrade(avgGradeScore)) }}>
+              {computeLetterGrade(avgGradeScore)}
             </span>
             <span className="grades-stat__label">Avg Grade</span>
           </div>
@@ -328,6 +347,45 @@ function Grades() {
               Total weight: {weights.attendance + weights.hours + weights.contribution}
               {" — "}Grade formula: (Attendance% × {weights.attendance} + Hours% × {weights.hours} + Contribution% × {weights.contribution}) / {weights.attendance + weights.hours + weights.contribution}
             </p>
+          </div>
+        )}
+
+        {/* Grade Scale Controls */}
+        {showGradesConfig && (
+          <div className="grades-scale card">
+            <h3 className="card__title">Grade Scale Configuration</h3>
+            <p className="card__sub">
+              Adjust the minimum percentage required for each letter grade. Lower bounds are inclusive.
+            </p>
+            <div className="grades-scale__grid">
+              {gradeScale.map((item, index) => (
+                <div key={item.grade} className="grades-scale__item">
+                  <span
+                    className="grades-scale__badge"
+                    style={{ background: gradeColor(item.grade) + "18", color: gradeColor(item.grade) }}
+                  >
+                    {item.grade}
+                  </span>
+                  <div className="grades-scale__input-row">
+                    <span className="grades-scale__label">≥</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={item.min}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        const newScale = [...gradeScale];
+                        newScale[index].min = Math.max(0, Math.min(100, val));
+                        setGradeScale(newScale);
+                      }}
+                      className="field-input field-input--sm grades-scale__input"
+                    />
+                    <span className="grades-scale__label">%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
