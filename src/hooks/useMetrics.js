@@ -86,7 +86,7 @@ export function useMetrics(teamId, teamCode) {
         : 0;
 
       const attendanceValues = Object.values(studentAttendance);
-      const presentCount = attendanceValues.filter((v) => v === "P").length;
+      const presentCount = attendanceValues.filter((v) => v === "P" || v === "Excused").length;
       const totalAttendance = attendanceValues.filter((v) => v === "P" || v === "A" || v === "Excused").length;
       const attendanceRate = totalAttendance > 0 ? (presentCount / totalAttendance) * 100 : 0;
 
@@ -136,7 +136,7 @@ export function useMetrics(teamId, teamCode) {
       const avgHrs = weekEfforts.length > 0 ? weekEfforts.reduce((a, b) => a + b, 0) / weekEfforts.length : 0;
       const weekAtts = studentStats.map((s) => s.weeklyAttendance[i]);
       const totalMarked = weekAtts.filter((v) => v === "P" || v === "A" || v === "Excused").length;
-      const presentW = weekAtts.filter((v) => v === "P").length;
+      const presentW = weekAtts.filter((v) => v === "P" || v === "Excused").length;
       const attRate = totalMarked > 0 ? (presentW / totalMarked) * 100 : 0;
       return { week: `W${w}`, avgHours: parseFloat(avgHrs.toFixed(1)), attendanceRate: parseFloat(attRate.toFixed(0)) };
     });

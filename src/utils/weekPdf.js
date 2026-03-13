@@ -108,7 +108,7 @@ export async function renderWeekPdfToDoc(
   const attendanceStatuses = roster
     .map((s) => attendanceMap[s.netid])
     .filter((v) => v === "P" || v === "A" || v === "Excused");
-  const presentCount = attendanceStatuses.filter((v) => v === "P").length;
+  const presentCount = attendanceStatuses.filter((v) => v === "P" || v === "Excused").length;
   const attendanceRate =
     attendanceStatuses.length > 0 ? (presentCount / attendanceStatuses.length) * 100 : 0;
 
@@ -139,7 +139,7 @@ export async function renderWeekPdfToDoc(
     const avg = hrsList.length > 0 ? total / hrsList.length : 0;
 
     const attList = attendanceByNetid[s.netid] || [];
-    const presentCountTD = attList.filter((v) => v === "P").length;
+    const presentCountTD = attList.filter((v) => v === "P" || v === "Excused").length;
     const attendanceRateTD = attList.length > 0 ? (presentCountTD / attList.length) * 100 : 0;
 
     return {
@@ -375,8 +375,7 @@ export async function renderWeekPdfToDoc(
   doc.setTextColor(primaryColor);
   const metricsLine = [
     `Avg Hours (this week): ${avgHours > 0 ? `${avgHours.toFixed(1)}h` : "—"}`,
-    `Attendance (this week): ${
-      attendanceStatuses.length > 0 ? `${attendanceRate.toFixed(0)}%` : "—"
+    `Attendance (this week): ${attendanceStatuses.length > 0 ? `${attendanceRate.toFixed(0)}%` : "—"
     }`,
     `Rating: ${teamRating || "—"}`,
   ].join("   •   ");
