@@ -39,7 +39,7 @@ The core functionality revolves around a structured, semester-based week timelin
     - Project overview, meeting link (as “Link”), and meeting time.
     - Team links rendered as `(Label) [Link]`.
     - Weekly comments.
-    - **Grades Page (Admin)**: Computed final grades using weighted formula (Attendance, Hours, Contribution); weights and Grade Letter thresholds are manually editable in the UI.
+    - **Grades Page (Admin)**: Computed final grades using weighted formula (Attendance, Hours, Contribution); weights and Grade Letter thresholds are manually editable in the UI. Hours are scored against a 10-hour target.
     - Per-student snapshot for that week (hours, attendance, contribution).
     - Student analytics **through that week** (cumulative total/avg hours, attendance rate) plus a compact metrics footer.
 

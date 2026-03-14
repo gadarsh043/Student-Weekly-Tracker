@@ -150,7 +150,7 @@ All styles use BEM-inspired class naming. Design tokens are CSS custom propertie
 - Effort/contribution inputs debounce writes (300ms via useRef timers); attendance and ratings save on click
 - `recharts` is used for data visualization (LineChart, PieChart, BarChart) on the Metrics page
 - WeekDetailPanel includes: team leader dropdown (from roster), comments, satisfaction rating buttons, inline attendance grid (P/A/E), effort + contribution inputs per student — admin sections gated behind `isAdmin`
-- Grades page auto-calculates letter grades via weighted formula: (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / totalWeight. Weights and the Grade Scale percentage thresholds are both admin-adjustable via the UI. Excused marks are counted as Present for attendance rate calculations.
+- Grades page auto-calculates letter grades via weighted formula: (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / totalWeight. Weights and the Grade Scale percentage thresholds are both admin-adjustable via the UI. Excused marks are counted as Present for attendance, and Hours worked is scored against a 10-hour maximum target (i.e. 10 hours = 100%).
 - `student_effort_points` stores both `effort_points` (hours) and `contribution_points` (1-10 scale) — upserted together via `onConflict: 'student_netid,team_id,week_number'`
 - CSV import uses check-then-insert: queries existing netids first, only inserts new students (never overwrites existing). Auto-creates teams T1-T13 if missing.
 - Semester config: `computeWeekDates(startDate, holidays)` in constants.js generates date ranges for timeline labels

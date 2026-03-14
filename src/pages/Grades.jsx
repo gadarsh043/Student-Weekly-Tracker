@@ -148,14 +148,14 @@ function Grades() {
   const gradedStudents = useMemo(() => {
     if (allStudents.length === 0) return [];
 
-    // Find max values for normalization
-    const maxHours = Math.max(...allStudents.map((s) => s.avgHours), 1);
+    // Normalize metrics
+    const targetHours = 10; // 10 hours = 100% effort score
     const maxContrib = 10; // Contribution is always 1-10 scale
 
     return allStudents.map((s) => {
       // Normalize each metric to 0-100
       const attScore = s.attendanceRate; // Already 0-100
-      const hoursScore = (s.avgHours / maxHours) * 100;
+      const hoursScore = Math.min((s.avgHours / targetHours) * 100, 100);
       const contribScore = (s.avgContribution / maxContrib) * 100;
 
       // Weighted total

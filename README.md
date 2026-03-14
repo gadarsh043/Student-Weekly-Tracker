@@ -29,7 +29,7 @@ A TA management tool for tracking weekly progress of senior design project teams
 - **Configurable weights** — admin-adjustable sliders for how much each metric counts (default: 30% attendance, 30% hours, 40% contribution)
 - **Sortable table** — sort all students by name, team, or grade
 - **Team filtering** — filter the grades view by team
-- **Grade formula** — (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / total weight, mapped to A+ through F via a customizable, live-editable grade scale. Excused marks are counted as Present.
+- **Grade formula** — (Attendance% x W1 + Hours% x W2 + Contribution% x W3) / total weight, mapped to A+ through F via a customizable, live-editable grade scale. Excused marks are counted as Present. Hours are scored out of a 10-hour target average (10 hours = 100%).
 
 ### Metrics Page (Admin)
 - **Weekly trends line chart** — avg hours + attendance rate over weeks (recharts)
