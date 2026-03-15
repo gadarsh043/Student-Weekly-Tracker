@@ -255,6 +255,13 @@ function Grades() {
             </select>
             <button
               type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={() => window.print()}
+            >
+              Print
+            </button>
+            <button
+              type="button"
               className={`btn ${showGradesConfig ? "btn--primary" : "btn--secondary"} btn--sm`}
               onClick={() => setShowGradesConfig((v) => !v)}
             >

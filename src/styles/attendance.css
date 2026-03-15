@@ -482,3 +482,75 @@
   font-weight: 800;
   letter-spacing: 0.02em;
 }
+
+/* --- Print Styles --- */
+@media print {
+  @page {
+    margin: 0; /* Hides the native browser date/URL headers */
+    size: auto;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .grades-page, .grades-page * {
+    visibility: visible;
+  }
+
+  .grades-page {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 1cm; /* Moved margin from @page to padding here to preserve layout space */
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  .grades-page__controls,
+  button,
+  .btn {
+    display: none !important;
+  }
+
+  .grades-table-wrapper {
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .grades-table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .grades-table th, .grades-table td {
+    border-bottom: 1px solid #ccc !important;
+    color: #000 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Force background colors on badges and sliders to print */
+  .grades-table__grade-badge,
+  .grades-scale__badge,
+  .grades-weights__slider {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .grades-weights, .grades-scale {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+
+  /* Force inputs to look like static text in print */
+  input[type="number"] {
+    border: none !important;
+    background: transparent !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
